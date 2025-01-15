@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "push": "dotenv -e .env.local -- npx prisma db push",
+    "migrate": "dotenv -e .env.local -- npx prisma migrate",
+    "generate": "npx prisma generate"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -27,6 +30,7 @@
     "postcss": "^8",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.10",
+    "prisma": "^6.2.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
