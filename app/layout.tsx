@@ -6,6 +6,7 @@ import { Inter as FontSans } from "next/font/google";
 import localFont from "next/font/local";
 
 import { cn } from "@/lib/utils";
+import { Providers } from "@/components/providers";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -31,13 +32,15 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "dark min-h-screen bg-background font-sans antialiased",
           fontSans.variable,
           fontHeading.variable
         )}
       >
         <div className="flex min-h-screen flex-col">
-          <main className="flex-1">{children}</main>
+          <main className="flex-1">
+            <Providers>{children}</Providers>
+          </main>
         </div>
       </body>
     </html>
