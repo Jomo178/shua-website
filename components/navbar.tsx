@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { ChevronDown, User } from "lucide-react";
+import { useTheme } from "next-themes"
+import { ChevronDown, Moon, Sun, LogOut } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 import {
@@ -17,6 +17,7 @@ import { Button } from "./ui/button";
 
 function Navbar() {
   const { data: session } = useSession();
+  const { setTheme, theme } = useTheme();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -54,11 +55,29 @@ function Navbar() {
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setTheme((prev)=> prev == "dark" ? "white" : "dark")}>
+                  <div className="flex items-center w-full">
+                    {theme === 'dark' ? (
+                      <>
+                        <Sun className="mr-2 h-4 w-4" />
+                        <span>Light Mode</span>
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="mr-2 h-4 w-4" />
+                        <span>Dark Mode</span>
+                      </>
+                    )}
+                  </div>
+                </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => signOut()}
                     className="cursor-pointer"
                   >
-                    Log out
+                    <div className="flex items-center w-full">
+                    <LogOut className="mr-2 h-4 w-4"/>
+                    <span>Log Out</span>
+                    </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
