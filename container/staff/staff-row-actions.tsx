@@ -1,10 +1,12 @@
+import { Row } from "@tanstack/react-table";
+import { Ellipsis } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
@@ -13,11 +15,10 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 
-import { Ellipsis} from "lucide-react"
+import { StaffTableItems } from "./staff-columns";
 
-export function RowActions({ row }: { row: Row<Item> }) {
+export function RowActions({ row }: { row: Row<StaffTableItems> }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

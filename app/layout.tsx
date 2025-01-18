@@ -4,6 +4,7 @@ import "../styles/globals.css";
 
 import { Inter as FontSans } from "next/font/google";
 import localFont from "next/font/local";
+import { Toaster } from "sonner";
 
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
@@ -39,7 +40,12 @@ export default function RootLayout({
       >
         <div className="flex min-h-screen flex-col">
           <main className="flex-1">
-            <Providers>{children}</Providers>
+            <Providers>
+              <div vaul-drawer-wrapper="" className="bg-background">
+                {children}
+                <Toaster position="top-right" richColors />
+              </div>
+            </Providers>
           </main>
         </div>
       </body>

@@ -61,6 +61,32 @@ model User {
 
   @@map("users_web")
 }
+
+model Staff {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  discordId String   @unique
+  role      StaffRole
+  isInTeam  Boolean @default(true)
+  create    AuthorizationType[] @default([])
+  edit      AuthorizationType[] @default([])
+  delete    AuthorizationType[] @default([])
+  handle    AuthorizationType[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  @@map("staff")
+}
+
+enum AuthorizationType {
+  issues 
+  staff 
+  event
+}
+
+enum StaffRole {
+  developer
+  cardCreator
+}
  
 model Issues {
   id        String  @id @map("_id") @default(auto()) @db.ObjectId
