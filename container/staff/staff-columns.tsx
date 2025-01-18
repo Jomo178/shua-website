@@ -1,3 +1,5 @@
+"use client";
+
 import { AuthorizationType, Staff, StaffRole } from "@prisma/client";
 import { ColumnDef, FilterFn } from "@tanstack/react-table";
 import { Session } from "next-auth";
@@ -16,7 +18,7 @@ const multiColumnFilterFn: FilterFn<StaffTableItems> = (
   filterValue
 ) => {
   const searchableRowContent =
-    `${row.original.name} ${row.original.email}`.toLowerCase();
+    `${row.original.name} ${row.original.email} ${row.original.global_name}`.toLowerCase();
   const searchTerm = (filterValue ?? "").toLowerCase();
   return searchableRowContent.includes(searchTerm);
 };
@@ -28,7 +30,6 @@ const statusFilterFn: FilterFn<StaffTableItems> = (
 ) => {
   if (!filterValue?.length) return true;
   const status = row.getValue(columnId) as string;
-  console.log(status);
   return filterValue.includes(status);
 };
 
@@ -100,7 +101,11 @@ export const staffColumns: ColumnDef<StaffTableItems>[] = [
   {
     header: "Joined",
     accessorKey: "createdAt",
-    cell: ({ row }) => formatTimestamp(new Date(row.getValue("createdAt"))),
+    cell: ({ row }) => (
+      <span suppressHydrationWarning>
+        {formatTimestamp(new Date(row.getValue("createdAt")))}
+      </span>
+    ),
   },
   {
     header: "Status",
@@ -160,7 +165,12 @@ export const staffColumns: ColumnDef<StaffTableItems>[] = [
   {
     id: "actions",
     header: () => <span className="sr-only">Actions</span>,
-    cell: ({ row }) => <RowActions row={row} />,
+    cell: ({ row, table }) => (
+      <RowActions
+        row={row}
+        setDataAction={table.options.meta?.setDataAction ?? (() => {})}
+      />
+    ),
     size: 60,
     enableHiding: false,
   },

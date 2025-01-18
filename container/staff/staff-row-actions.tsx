@@ -1,5 +1,10 @@
+"use client";
+
+import { Dispatch, SetStateAction, useState } from "react";
+import { archiveStaff } from "@/server/staff-action";
 import { Row } from "@tanstack/react-table";
 import { Ellipsis } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -7,72 +12,81 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { StaffEdit } from "./staff-actions";
 import { StaffTableItems } from "./staff-columns";
 
-export function RowActions({ row }: { row: Row<StaffTableItems> }) {
+export function RowActions({
+  row,
+  setDataAction,
+}: {
+  row: Row<StaffTableItems>;
+  setDataAction: Dispatch<SetStateAction<StaffTableItems[]>>;
+}) {
+  const [modalOpen, setModalOpen] = useState(false);
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className="flex justify-end">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="shadow-none"
-            aria-label="Edit item"
-          >
-            <Ellipsis size={16} strokeWidth={2} aria-hidden="true" />
-          </Button>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <span>Edit</span>
-            <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span>Duplicate</span>
-            <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <span>Archive</span>
-            <DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Move to project</DropdownMenuItem>
-                <DropdownMenuItem>Move to folder</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Advanced options</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Share</DropdownMenuItem>
-          <DropdownMenuItem>Add to favorites</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive focus:text-destructive">
-          <span>Delete</span>
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="flex justify-end">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="shadow-none"
+              aria-label="Edit item"
+            >
+              <Ellipsis size={16} strokeWidth={2} aria-hidden="true" />
+            </Button>
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => setModalOpen(true)}>
+              <span>Edit</span>
+              <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                toast.promise(
+                  archiveStaff(row.original.discordId, row.original.isInTeam),
+                  {
+                    loading: `${row.original.isInTeam ? "Archive" : "Unarchive"} staff...`,
+                    success({ message }) {
+                      setDataAction((prevData) =>
+                        prevData.map((staff) => {
+                          if (staff.discordId === row.original.discordId) {
+                            return {
+                              ...staff,
+                              isInTeam: !staff.isInTeam,
+                              status: staff.isInTeam ? "Inactive" : "Active",
+                              updatedAt: new Date(),
+                            };
+                          }
+                          return staff;
+                        })
+                      );
+                      return message;
+                    },
+                    error: "Failed to archive staff.",
+                  }
+                );
+              }}
+            >
+              <span>{row.original.isInTeam ? "Archive" : "Unarchive"}</span>
+              <DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <StaffEdit
+        isOpen={modalOpen}
+        setIsOpenAction={setModalOpen}
+        staffInformation={row.original}
+        setDataAction={setDataAction}
+      />
+    </>
   );
 }

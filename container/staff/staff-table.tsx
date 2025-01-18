@@ -56,7 +56,7 @@ import {
 } from "@/components/ui/popover";
 
 import TablePagination from "../../components/table-pagination";
-import StaffAdd from "./staff-add";
+import { StaffAdd } from "./staff-actions";
 
 export default function StaffTable({
   staffItems,
@@ -98,6 +98,7 @@ export default function StaffTable({
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     enableSortingRemoval: false,
+    autoResetPageIndex: false,
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
     onColumnFiltersChange: setColumnFilters,
@@ -109,6 +110,9 @@ export default function StaffTable({
       pagination,
       columnFilters,
       columnVisibility,
+    },
+    meta: {
+      setDataAction: setData,
     },
   });
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Image from "next/image";
-import { useTheme } from "next-themes"
-import { ChevronDown, Moon, Sun, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, Moon, Sun } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 
 import {
   DropdownMenu,
@@ -17,9 +17,19 @@ import { Button } from "./ui/button";
 
 function Navbar() {
   const { data: session } = useSession();
-  const { setTheme, theme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
 
   const [isOpen, setIsOpen] = useState(false);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+    //TODO: Fix this
+    // setMetaColor(
+    //   resolvedTheme === "dark"
+    //     ? META_THEME_COLORS.light
+    //     : META_THEME_COLORS.dark
+    // );
+  }, [resolvedTheme, setTheme]);
 
   return (
     <header className="w-full">
@@ -55,28 +65,28 @@ function Navbar() {
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme((prev)=> prev == "dark" ? "white" : "dark")}>
-                  <div className="flex items-center w-full">
-                    {theme === 'dark' ? (
-                      <>
-                        <Sun className="mr-2 h-4 w-4" />
-                        <span>Light Mode</span>
-                      </>
-                    ) : (
-                      <>
-                        <Moon className="mr-2 h-4 w-4" />
-                        <span>Dark Mode</span>
-                      </>
-                    )}
-                  </div>
-                </DropdownMenuItem>
+                  <DropdownMenuItem onClick={toggleTheme}>
+                    <div className="flex w-full items-center">
+                      {resolvedTheme === "dark" ? (
+                        <>
+                          <Sun className="mr-2 h-4 w-4" />
+                          <span>Light Mode</span>
+                        </>
+                      ) : (
+                        <>
+                          <Moon className="mr-2 h-4 w-4" />
+                          <span>Dark Mode</span>
+                        </>
+                      )}
+                    </div>
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => signOut()}
                     className="cursor-pointer"
                   >
-                    <div className="flex items-center w-full">
-                    <LogOut className="mr-2 h-4 w-4"/>
-                    <span>Log Out</span>
+                    <div className="flex w-full items-center">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log Out</span>
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

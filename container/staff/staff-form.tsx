@@ -1,11 +1,6 @@
-"use client";
-
 import { Dispatch, Fragment, SetStateAction, useState } from "react";
-import { addStaff } from "@/server/staff-action";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { AuthorizationType, StaffRole } from "@prisma/client";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { UseFormReturn } from "react-hook-form";
 
 import { cn, toUpperCase } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -43,67 +38,29 @@ import {
   staffFormSchema,
   StaffFormSchemaType,
 } from "./staff";
-import { StaffTableItems } from "./staff-columns";
 
-interface StaffAddProps {
-  setDataAction: Dispatch<SetStateAction<StaffTableItems[]>>;
+interface StaffFormProps {
+  form: UseFormReturn<StaffFormSchemaType>;
+  onSubmit: (values: StaffFormSchemaType) => void;
+  title: string;
   isOpen: boolean;
   setIsOpenAction: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function StaffAdd({
-  setDataAction,
+function StaffForm({
+  form,
+  onSubmit,
+  title,
   isOpen,
   setIsOpenAction,
-}: StaffAddProps) {
-  const form = useForm<StaffFormSchemaType>({
-    resolver: zodResolver(staffFormSchema),
-    defaultValues: {
-      discordId: "",
-      create: [],
-      edit: [],
-      delete: [],
-      handle: [],
-    },
-  });
-
+}: StaffFormProps) {
   const roles = Object.values(StaffRole);
-  const permissionsTree = getPermissionsTree();
-
-  function onSubmit(values: StaffFormSchemaType) {
-    setIsOpenAction(false);
-
-    toast.promise(addStaff(values), {
-      loading: "Adding staff...",
-      success({ message, staff }) {
-        form.reset();
-        if (!staff) return message;
-        setDataAction((prevData) => [
-          ...prevData,
-          {
-            ...values,
-            id: crypto.randomUUID(),
-            image: staff.avatar,
-            name: staff.username,
-            global_name: staff.global_name,
-            email: "Not Provided",
-            isInTeam: true,
-            status: "Active",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ]);
-        return message;
-      },
-      error: "Failed to add staff.",
-    });
-  }
-
+  const permissionsTree = getPermissionsTree(form.getValues());
   return (
     <Credenza open={isOpen} onOpenChange={setIsOpenAction}>
       <CredenzaContent className="md:max-w-sm">
         <CredenzaHeader>
-          <CredenzaTitle>Add New Staff</CredenzaTitle>
+          <CredenzaTitle>{title}</CredenzaTitle>
         </CredenzaHeader>
         <CredenzaBody>
           <Form {...form}>
@@ -115,7 +72,11 @@ export default function StaffAdd({
                   <FormItem>
                     <FormLabel>Discord ID</FormLabel>
                     <FormControl>
-                      <Input type="text" {...field} />
+                      <Input
+                        type="text"
+                        {...field}
+                        disabled={title.includes("Edit")}
+                      />
                     </FormControl>
                     <FormDescription>
                       Add the unique Discord ID of the staff member.
@@ -216,7 +177,7 @@ export default function StaffAdd({
           <Button variant="destructive" onClick={() => setIsOpenAction(false)}>
             Close
           </Button>
-          <Button onClick={form.handleSubmit(onSubmit)}>Add Staff</Button>
+          <Button onClick={() => onSubmit(form.getValues())}>{title}</Button>
         </CredenzaFooter>
       </CredenzaContent>
     </Credenza>
@@ -306,3 +267,5 @@ function TreeCheckBox({
     </div>
   );
 }
+
+export default StaffForm;
