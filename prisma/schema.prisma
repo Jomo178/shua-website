@@ -63,23 +63,25 @@ model User {
 }
 
 model Staff {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  discordId String   @unique
+  id        String              @id @default(auto()) @map("_id") @db.ObjectId
+  discordId String              @unique
   role      StaffRole
-  isInTeam  Boolean @default(true)
+  isInTeam  Boolean             @default(true)
   create    AuthorizationType[] @default([])
   edit      AuthorizationType[] @default([])
   delete    AuthorizationType[] @default([])
   handle    AuthorizationType[] @default([])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
- 
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  createdEvents Events[] @relation("event_createdBy")
+
   @@map("staff")
 }
 
 enum AuthorizationType {
-  issues 
-  staff 
+  issues
+  staff
   event
 }
 
@@ -87,19 +89,35 @@ enum StaffRole {
   developer
   cardCreator
 }
- 
+
 model Issues {
-  id        String  @id @map("_id") @default(auto()) @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   era       String
   group     String
-  rarity   Json 
+  rarity    Json
   code      String
-  image     String 
+  image     String
   droppable Boolean
-  createdAt DateTime 
+  createdAt DateTime
   updatedAt DateTime @updatedAt
 
   @@map("issues")
 }
-  
+
+model Events {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String     @unique
+  start       DateTime
+  end         DateTime
+  releaseType EventTypes
+  createdById String     @db.ObjectId
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  createdBy Staff @relation(fields: [createdById], references: [id], name: "event_createdBy")
+}
+
+enum EventTypes {
+  issues
+}
