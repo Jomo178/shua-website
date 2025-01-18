@@ -9,6 +9,7 @@ import { Toaster } from "sonner";
 
 import { authOptions } from "@/lib/authOptions";
 import { cn } from "@/lib/utils";
+import { TailwindIndicator } from "@/components/ui/tailwind-indicator";
 import { Providers } from "@/components/providers";
 
 const fontSans = FontSans({
@@ -61,6 +62,7 @@ export default async function RootLayout({
               <div vaul-drawer-wrapper="" className="bg-background">
                 {children}
                 <Toaster position="top-right" richColors />
+                <TailwindIndicator />
               </div>
             </Providers>
           </main>

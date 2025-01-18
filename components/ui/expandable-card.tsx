@@ -1,26 +1,28 @@
 "use client";
 
-import React, { useRef, useEffect,useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useSpring } from "framer-motion";
 import {
+  CheckCircle2,
   Clock,
   GitBranch,
   Github,
+  Menu,
   MessageSquare,
   StepForwardIcon as Progress,
   Star,
   Users,
-  CheckCircle2,
 } from "lucide-react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress as ProgressBar } from "@/components/ui/progress";
 import {
   Tooltip,
@@ -28,7 +30,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useExpandable } from "@/hooks/use-expandable";
 
 interface ProjectStatusCardProps {
   title: string;
@@ -38,6 +39,19 @@ interface ProjectStatusCardProps {
   tasks: Array<{ title: string; completed: boolean }>;
   githubStars: number;
   openIssues: number;
+}
+
+export function useExpandable(initialState = false) {
+  const [isExpanded, setIsExpanded] = useState(initialState);
+
+  const springConfig = { stiffness: 300, damping: 30 };
+  const animatedHeight = useSpring(0, springConfig);
+
+  const toggleExpand = useCallback(() => {
+    setIsExpanded((prev) => !prev);
+  }, []);
+
+  return { isExpanded, toggleExpand, animatedHeight };
 }
 
 export function ProjectStatusCard({
@@ -51,18 +65,6 @@ export function ProjectStatusCard({
 }: ProjectStatusCardProps) {
   const { isExpanded, toggleExpand, animatedHeight } = useExpandable();
   const contentRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-
-  useEffect(() => {
-    const updateWidth = () => {
-      if (contentRef.current) {
-        setWidth(contentRef.current.offsetWidth);
-      }
-    };
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => {window.removeEventListener("resize", updateWidth);};
-  }, []);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -76,7 +78,7 @@ export function ProjectStatusCard({
       onClick={toggleExpand}
     >
       <CardHeader className="space-y-1">
-        <div className="flex justify-between items-start w-full">
+        <div className="flex w-full items-start justify-between">
           <div className="space-y-2">
             <Badge
               variant="secondary"
@@ -90,15 +92,15 @@ export function ProjectStatusCard({
             </Badge>
             <h3 className="text-2xl font-semibold">{title}</h3>
           </div>
-          <TooltipProvider>
+          <TooltipProvider delayDuration={100}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button size="icon" variant="outline" className="h-8 w-8">
-                  <Github className="h-4 w-4" />
+                  <Menu className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>View on GitHub</p>
+                <p>Edit</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -131,24 +133,24 @@ export function ProjectStatusCard({
                   >
                     <div className="flex items-center justify-between text-sm text-gray-600">
                       <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-2" />
-                        <span>Due {dueDate}</span>
+                        <Clock className="mr-2 h-4 w-4" />
+                        <span>End {dueDate}</span>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="flex items-center">
-                          <Star className="h-4 w-4 mr-1 text-yellow-400" />
+                          <Star className="mr-1 h-4 w-4 text-yellow-400" />
                           <span>{githubStars}</span>
                         </div>
                         <div className="flex items-center">
-                          <GitBranch className="h-4 w-4 mr-1" />
+                          <GitBranch className="mr-1 h-4 w-4" />
                           <span>{openIssues} issues</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <h4 className="font-medium text-sm flex items-center">
-                        <Users className="h-4 w-4 mr-2" />
+                      <h4 className="flex items-center text-sm font-medium">
+                        <Users className="mr-2 h-4 w-4" />
                         Contributors
                       </h4>
                       <div className="flex -space-x-2">
@@ -179,7 +181,7 @@ export function ProjectStatusCard({
                     </div>
 
                     <div className="space-y-2">
-                      <h4 className="font-medium text-sm">Recent Tasks</h4>
+                      <h4 className="text-sm font-medium">Recent Tasks</h4>
                       {tasks.map((task, index) => (
                         <div
                           key={index}
@@ -195,7 +197,7 @@ export function ProjectStatusCard({
 
                     <div className="space-y-2">
                       <Button className="w-full">
-                        <MessageSquare className="h-4 w-4 mr-2" />
+                        <MessageSquare className="mr-2 h-4 w-4" />
                         View Discussion
                       </Button>
                     </div>
@@ -208,12 +210,10 @@ export function ProjectStatusCard({
       </CardContent>
 
       <CardFooter>
-        <div className="flex items-center justify-between w-full text-sm gap-3 text-gray-600 flex-wrap">
+        <div className="flex w-full items-center justify-between text-sm text-gray-600">
           <span>Last updated: 2 hours ago</span>
-          {width < 300 &&  <span >/</span>}
           <span>{openIssues} open issues</span>
         </div>
-
       </CardFooter>
     </Card>
   );

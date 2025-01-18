@@ -1,5 +1,3 @@
-"use client";
-
 import { Dispatch, SetStateAction } from "react";
 import { addStaff, editStaff } from "@/server/staff-action";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -99,7 +97,6 @@ export function StaffEdit({
 
   function onSubmit(values: StaffFormSchemaType) {
     setIsOpenAction(false);
-    console.log(values);
 
     toast.promise(editStaff(values), {
       loading: "Editing staff...",

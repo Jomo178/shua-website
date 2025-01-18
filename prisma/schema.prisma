@@ -106,18 +106,18 @@ model Issues {
 }
 
 model Events {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  name        String     @unique
-  start       DateTime
-  end         DateTime
-  releaseType EventTypes
-  createdById String     @db.ObjectId
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  name             String    @unique
+  start            DateTime
+  end              DateTime
+  itemsReleaseType ItemsType
+  createdById      String    @db.ObjectId
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   createdBy Staff @relation(fields: [createdById], references: [id], name: "event_createdBy")
 }
 
-enum EventTypes {
+enum ItemsType {
   issues
 }

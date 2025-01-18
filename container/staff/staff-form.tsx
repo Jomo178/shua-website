@@ -33,11 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import {
-  getPermissionsTree,
-  staffFormSchema,
-  StaffFormSchemaType,
-} from "./staff";
+import { getPermissionsTree, StaffFormSchemaType } from "./staff";
 
 interface StaffFormProps {
   form: UseFormReturn<StaffFormSchemaType>;
@@ -177,7 +173,7 @@ function StaffForm({
           <Button variant="destructive" onClick={() => setIsOpenAction(false)}>
             Close
           </Button>
-          <Button onClick={() => onSubmit(form.getValues())}>{title}</Button>
+          <Button onClick={form.handleSubmit(onSubmit)}>{title}</Button>
         </CredenzaFooter>
       </CredenzaContent>
     </Credenza>

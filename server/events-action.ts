@@ -1,7 +1,9 @@
 "use server";
 
-import { unstable_cache } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { eventFormSchema, EventFormSchemaType } from "@/container/event/event";
 
+import { EventsWithRelation } from "@/types/prisma-relations";
 import { prisma } from "@/lib/database";
 
 export const getAllEvents = unstable_cache(
@@ -17,3 +19,38 @@ export const getAllEvents = unstable_cache(
   ["/events"],
   { revalidate: 60 * 60 * 24, tags: ["events"] }
 );
+
+export async function addEvent(
+  formData: EventFormSchemaType
+): Promise<{ message: string; event?: EventsWithRelation }> {
+  const validatedFields = eventFormSchema.safeParse(formData);
+  if (!validatedFields.success) {
+    return { message: "Not valid Data." };
+  }
+
+  const eventExists = await prisma.events.findFirst({
+    where: { name: formData.name },
+  });
+
+  if (eventExists) {
+    return { message: "Event already exists." };
+  }
+
+  const event = await prisma.events.create({
+    data: {
+      name: formData.name,
+      start: formData.start,
+      end: formData.end,
+      itemsReleaseType: formData.itemsReleaseType,
+      createdById: formData.createdById,
+    },
+    include: {
+      createdBy: true,
+    },
+  });
+
+  revalidatePath("/events");
+  revalidateTag("events");
+
+  return { message: "Event added successfully!", event };
+}

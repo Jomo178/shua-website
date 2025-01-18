@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-
-
-
-
+import { Matcher } from "react-day-picker";
 
 interface DateInputProps {
   value?: Date;
   onChange: (date: Date) => void;
+  disabledRange?: Matcher | Matcher[];
 }
 
 interface DateParts {
@@ -17,12 +15,16 @@ interface DateParts {
   year: number;
 }
 
-const DateInput: React.FC<DateInputProps> = ({ value, onChange }) => {
+const DateInput: React.FC<DateInputProps> = ({
+  value,
+  onChange,
+  disabledRange,
+}) => {
   const [date, setDate] = React.useState<DateParts>(() => {
     const d = value ? new Date(value) : new Date();
     return {
       day: d.getDate(),
-      month: d.getMonth() + 1, // JavaScript months are 0-indexed
+      month: d.getMonth() + 1,
       year: d.getFullYear(),
     };
   });
@@ -40,6 +42,22 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange }) => {
     });
   }, [value]);
 
+  const isDateDisabled = (date: Date): boolean => {
+    if (!disabledRange) return false;
+    if (Array.isArray(disabledRange)) {
+      return disabledRange.some((matcher) =>
+        typeof matcher === "function"
+          ? matcher(date)
+          : typeof matcher === "object" &&
+            "before" in matcher &&
+            date < matcher.before
+      );
+    }
+    return typeof disabledRange === "function"
+      ? disabledRange(date)
+      : (disabledRange as any).before && date < (disabledRange as any).before;
+  };
+
   const validateDate = (field: keyof DateParts, value: number): boolean => {
     if (
       (field === "day" && (value < 1 || value > 31)) ||
@@ -52,10 +70,12 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange }) => {
     // Validate the day of the month
     const newDate = { ...date, [field]: value };
     const d = new Date(newDate.year, newDate.month - 1, newDate.day);
+
     return (
       d.getFullYear() === newDate.year &&
       d.getMonth() + 1 === newDate.month &&
-      d.getDate() === newDate.day
+      d.getDate() === newDate.day &&
+      !isDateDisabled(d)
     );
   };
 
@@ -146,8 +166,14 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange }) => {
           newDate.year += 1;
         }
 
-        setDate(newDate);
-        onChange(new Date(newDate.year, newDate.month - 1, newDate.day));
+        if (
+          !isDateDisabled(
+            new Date(newDate.year, newDate.month - 1, newDate.day)
+          )
+        ) {
+          setDate(newDate);
+          onChange(new Date(newDate.year, newDate.month - 1, newDate.day));
+        }
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
         let newDate = { ...date };
@@ -177,8 +203,14 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange }) => {
           newDate.year -= 1;
         }
 
-        setDate(newDate);
-        onChange(new Date(newDate.year, newDate.month - 1, newDate.day));
+        if (
+          !isDateDisabled(
+            new Date(newDate.year, newDate.month - 1, newDate.day)
+          )
+        ) {
+          setDate(newDate);
+          onChange(new Date(newDate.year, newDate.month - 1, newDate.day));
+        }
       }
 
       if (e.key === "ArrowRight") {

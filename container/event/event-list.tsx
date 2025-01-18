@@ -1,16 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { Staff } from "@prisma/client";
 
 import { EventsWithRelation } from "@/types/prisma-relations";
 
 import { EventAdd } from "./event-actions";
+import EventCard from "./event-card";
 
 interface EventsListProps {
+  currentUser: Staff;
   events: EventsWithRelation[];
 }
 
-function EventsList({ events }: EventsListProps) {
+function EventsList({ currentUser, events }: EventsListProps) {
   //   if (events.length == 0) {
   //     return <div>No events found.</div>;
   //   }
@@ -51,8 +54,32 @@ function EventsList({ events }: EventsListProps) {
   return (
     <div className="container mt-10 space-y-5">
       <div>
-        <EventAdd setEventStateAction={setEventState} />
+        <EventAdd
+          currentUser={currentUser}
+          setEventStateAction={setEventState}
+        />
       </div>
+      {currentEvents ? (
+        <section>
+          <h2 className="mb-4 text-xl font-bold">
+            {currentEvents.length > 0 ? "Current Events" : "Current Event"}
+          </h2>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {currentEvents.map((event, index) => (
+              <EventCard event={event} currentUser={currentUser} key={index} />
+            ))}
+          </div>
+        </section>
+      ) : (
+        nextEvent && (
+          <section>
+            <h2 className="mb-4 text-xl font-bold">Next Event</h2>
+            <div className="grid grid-cols-1 gap-5">
+              <EventCard event={nextEvent} currentUser={currentUser} />
+            </div>
+          </section>
+        )
+      )}
     </div>
   );
 }

@@ -2,11 +2,14 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { staffFormSchema, StaffFormSchemaType } from "@/container/staff/staff";
+import { DiscordProfile } from "next-auth/providers/discord";
 
 import { prisma } from "@/lib/database";
 import { fetchUserProfilesFromDiscord } from "@/lib/session";
 
-export async function addStaff(formData: StaffFormSchemaType) {
+export async function addStaff(
+  formData: StaffFormSchemaType
+): Promise<{ message: string; staff?: DiscordProfile }> {
   const validatedFields = staffFormSchema.safeParse(formData);
   if (!validatedFields.success) {
     return { message: "Not valid Data." };
