@@ -2,6 +2,7 @@
 
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { eventFormSchema, EventFormSchemaType } from "@/container/event/event";
+import { ItemsType } from "@prisma/client";
 
 import { EventsWithRelation } from "@/types/prisma-relations";
 import { prisma } from "@/lib/database";
@@ -18,6 +19,21 @@ export const getAllEvents = unstable_cache(
   },
   ["/events"],
   { revalidate: 60 * 60 * 24, tags: ["events"] }
+);
+
+export const getCurrentEvent = unstable_cache(
+  async (items: ItemsType[]) => {
+    const event = await prisma.events.findFirst({
+      where: { itemsReleaseType: { in: items } },
+      include: {
+        createdBy: true,
+      },
+    });
+
+    return event;
+  },
+  ["/current-event"],
+  { revalidate: 60 * 60 * 24, tags: ["current-event"] }
 );
 
 export async function addEvent(
@@ -51,6 +67,8 @@ export async function addEvent(
 
   revalidatePath("/events");
   revalidateTag("events");
+  revalidatePath("/current-event");
+  revalidateTag("current-event");
 
   return { message: "Event added successfully!", event };
 }
@@ -87,6 +105,8 @@ export async function editEvent(
 
   revalidatePath("/events");
   revalidateTag("events");
+  revalidatePath("/current-event");
+  revalidateTag("current-event");
 
   return { message: "Event updated successfully!", event };
 }
