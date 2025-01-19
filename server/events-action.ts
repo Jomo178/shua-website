@@ -54,3 +54,39 @@ export async function addEvent(
 
   return { message: "Event added successfully!", event };
 }
+
+export async function editEvent(
+  id: string,
+  formData: EventFormSchemaType
+): Promise<{ message: string; event?: EventsWithRelation }> {
+  const validatedFields = eventFormSchema.safeParse(formData);
+  if (!validatedFields.success) {
+    return { message: "Not valid Data." };
+  }
+
+  const eventExists = await prisma.events.findFirst({
+    where: { id: id },
+  });
+
+  if (!eventExists) {
+    return { message: "Event does not exist." };
+  }
+
+  const event = await prisma.events.update({
+    where: { id: id },
+    data: {
+      name: formData.name,
+      start: formData.start,
+      end: formData.end,
+      itemsReleaseType: formData.itemsReleaseType,
+    },
+    include: {
+      createdBy: true,
+    },
+  });
+
+  revalidatePath("/events");
+  revalidateTag("events");
+
+  return { message: "Event updated successfully!", event };
+}

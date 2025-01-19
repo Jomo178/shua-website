@@ -52,6 +52,7 @@ function StaffForm({
 }: StaffFormProps) {
   const roles = Object.values(StaffRole);
   const permissionsTree = getPermissionsTree(form.getValues());
+
   return (
     <Credenza open={isOpen} onOpenChange={setIsOpenAction}>
       <CredenzaContent className="md:max-w-sm">

@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, useState } from "react";
-import { addEvent } from "@/server/events-action";
+import { addEvent, editEvent } from "@/server/events-action";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Staff } from "@prisma/client";
 import { useForm } from "react-hook-form";
@@ -62,5 +62,63 @@ export function EventAdd({ currentUser, setEventStateAction }: EventAddProps) {
         title="Add Event"
       />
     </>
+  );
+}
+
+interface EventEditProps extends React.HTMLAttributes<HTMLDivElement> {
+  event: EventsWithRelation;
+  setEventStateAction: Dispatch<SetStateAction<EventsWithRelation[]>>;
+  isOpen: boolean;
+  setIsOpenAction: Dispatch<SetStateAction<boolean>>;
+}
+
+export function EventEdit({
+  event,
+  setEventStateAction,
+  isOpen,
+  setIsOpenAction,
+  ...props
+}: EventEditProps) {
+  const form = useForm<EventFormSchemaType>({
+    resolver: zodResolver(eventFormSchema),
+    defaultValues: {
+      name: event.name,
+      start: new Date(event.start).toISOString(),
+      end: new Date(event.end).toISOString(),
+      itemsReleaseType: event.itemsReleaseType,
+      createdById: event.createdById,
+    },
+  });
+
+  const onSubmit = (values: EventFormSchemaType) => {
+    setIsOpenAction(false);
+
+    toast.promise(editEvent(event.id, values), {
+      loading: "Updating event...",
+      success({ message, event }) {
+        form.reset();
+        if (!event) return message;
+        setEventStateAction((prevData) => [
+          ...prevData.filter((e) => e.id !== event.id),
+          {
+            ...event,
+          },
+        ]);
+        return message;
+      },
+      error: "Failed to update event.",
+    });
+  };
+
+  return (
+    <div {...props}>
+      <EventForm
+        form={form}
+        isOpen={isOpen}
+        setIsOpenAction={setIsOpenAction}
+        onSubmitAction={onSubmit}
+        title="Edit Event"
+      />
+    </div>
   );
 }

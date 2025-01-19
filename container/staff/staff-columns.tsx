@@ -135,7 +135,7 @@ export const staffColumns: ColumnDef<StaffTableItems>[] = [
       const permissions = Object.values(AuthorizationType);
 
       return (
-        <div className="hidden grid-cols-2 gap-2 md:grid">
+        <div className="grid grid-cols-2 gap-2">
           {hasCreatePermissions && (
             <Badge className="min-w-fit">
               Create {permissions.length}/{staff.create.length}

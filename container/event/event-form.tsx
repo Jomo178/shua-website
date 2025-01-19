@@ -66,11 +66,7 @@ export function EventForm({
                   <FormItem>
                     <FormLabel>Event Name</FormLabel>
                     <FormControl>
-                      <Input
-                        type="text"
-                        {...field}
-                        disabled={title.includes("Edit")}
-                      />
+                      <Input type="text" {...field} />
                     </FormControl>
                     <FormDescription>
                       The name of the event, e.g. "Shua Release #1"

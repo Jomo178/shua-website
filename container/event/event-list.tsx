@@ -66,7 +66,12 @@ function EventsList({ currentUser, events }: EventsListProps) {
           </h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {currentEvents.map((event, index) => (
-              <EventCard event={event} currentUser={currentUser} key={index} />
+              <EventCard
+                event={event}
+                setEventStateAction={setEventState}
+                currentUser={currentUser}
+                key={index}
+              />
             ))}
           </div>
         </section>
@@ -75,10 +80,32 @@ function EventsList({ currentUser, events }: EventsListProps) {
           <section>
             <h2 className="mb-4 text-xl font-bold">Next Event</h2>
             <div className="grid grid-cols-1 gap-5">
-              <EventCard event={nextEvent} currentUser={currentUser} />
+              <EventCard
+                event={nextEvent}
+                setEventStateAction={setEventState}
+                currentUser={currentUser}
+              />
             </div>
           </section>
         )
+      )}
+
+      {pastEvents.length > 0 && (
+        <section>
+          <h2 className="mb-4 text-xl font-bold">
+            {pastEvents.length > 0 ? "Past Events" : "Past Event"}
+          </h2>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {pastEvents.map((event, index) => (
+              <EventCard
+                event={event}
+                setEventStateAction={setEventState}
+                currentUser={currentUser}
+                key={index}
+              />
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
