@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import useLocalStorage from "@/hooks/use-local-storage";
+
 export const addFormSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Issue Name is required!"),
@@ -7,8 +9,26 @@ export const addFormSchema = z.object({
   era: z.string().min(1, "Issue Era is required!"),
   group: z.string().min(1, "Issue Group is required!"),
   code: z.string().min(1, "Issue Code is required!"),
+  codeDuplicate: z.boolean().optional(),
+  rarity: z.object({
+    name: z.string().min(1, "Rarity Name is required!"),
+    icon: z.string().min(1, "Rarity Icon is required!"),
+  }),
   image: fileValidation(),
+  errors: z
+    .array(
+      z
+        .object({
+          path: z.string().optional(),
+          message: z.string().optional(),
+        })
+        .optional()
+    )
+    .optional()
+    .default([]),
 });
+
+export type AddFormSchemaType = z.infer<typeof addFormSchema>;
 
 function fileValidation(allowedExtensions: string[] = ["png", "jpg"]) {
   return z
@@ -37,3 +57,19 @@ function checkFileType(
   }
   return false;
 }
+
+export const defaultAddFromValues = () => {
+  return useLocalStorage<Omit<AddFormSchemaType, "errors" | "releaseDate">>(
+    "defaultIssueFormValues",
+    {
+      id: "1",
+      name: "",
+      group: "",
+      era: "",
+      code: "",
+      codeDuplicate: false,
+      rarity: { name: "", icon: "" },
+      image: new File([""], "filename"),
+    }
+  );
+};

@@ -1,6 +1,10 @@
 "use server";
 
-import { unstable_cache } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import {
+  rarityFormSchema,
+  RarityFormSchemaType,
+} from "@/container/add/add-rarity";
 import { StaffTableItems } from "@/container/staff/staff-columns";
 
 import { prisma } from "@/lib/database";
@@ -39,3 +43,40 @@ export const getStaffAllInformation = unstable_cache(
   ["/staff"],
   { revalidate: 60 * 60 * 24, tags: ["staff"] }
 );
+
+export const getAllRarities = unstable_cache(
+  async () => {
+    const rarities = await prisma.rarity.findMany();
+    return rarities;
+  },
+  ["/rarities"],
+  { revalidate: 60 * 60 * 24, tags: ["rarities"] }
+);
+
+export async function addRarity(formData: RarityFormSchemaType) {
+  const validatedFields = rarityFormSchema.safeParse(formData);
+  if (!validatedFields.success) {
+    return { message: "Not valid Data." };
+  }
+
+  const rarityExists = await prisma.rarity.findUnique({
+    where: { name: formData.name },
+  });
+
+  if (rarityExists) {
+    return { message: "Rarity already exists with the same name." };
+  }
+
+  const rarity = await prisma.rarity.create({
+    data: {
+      name: formData.name,
+      icon: formData.icon,
+      createdById: formData.createdById,
+    },
+  });
+
+  revalidatePath("/rarities");
+  revalidateTag("rarities");
+
+  return { message: "Rarity added successfully!", rarity };
+}

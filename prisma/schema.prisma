@@ -75,6 +75,7 @@ model Staff {
   updatedAt DateTime            @updatedAt
 
   createdEvents Events[] @relation("event_createdBy")
+  Rarity        Rarity[] @relation("rarity_createdBy")
 
   @@map("staff")
 }
@@ -103,6 +104,17 @@ model Issues {
   updatedAt DateTime @updatedAt
 
   @@map("issues")
+}
+
+model Rarity {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  icon        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String   @db.ObjectId
+
+  createdBy Staff @relation(fields: [createdById], references: [id], name: "rarity_createdBy")
 }
 
 model Events {

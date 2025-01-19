@@ -3,6 +3,8 @@
 import { SessionProvider, SessionProviderProps } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 
+import { TooltipProvider } from "./ui/tooltip";
+
 export function Providers({
   children,
   session,
@@ -19,7 +21,7 @@ export function Providers({
         disableTransitionOnChange
         enableColorScheme
       >
-        {children}
+        <TooltipProvider delayDuration={100}>{children}</TooltipProvider>
       </ThemeProvider>
     </SessionProvider>
   );

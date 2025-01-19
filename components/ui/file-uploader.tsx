@@ -232,7 +232,7 @@ export function FileUploader(props: FileUploaderProps) {
                   </div>
                   <div className="flex flex-col gap-px">
                     <p className="font-medium text-muted-foreground">
-                      Drag {`'n'`} drop files here, or click to select files
+                      Drag or click to upload
                     </p>
                     <p className="text-sm text-muted-foreground/70">
                       You can upload
