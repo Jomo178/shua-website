@@ -51,10 +51,10 @@ export const metadata = {
     },
   ],
   creator: "jomo",
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-  ],
+  // themeColor: [
+  //   { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  //   { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  // ],
   openGraph: {
     type: "website",
     locale: "en_US",

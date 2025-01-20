@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import useLocalStorage from "@/hooks/use-local-storage";
+import { CarouselApi } from "@/components/ui/carousel";
 
 export const addFormSchema = z.object({
   id: z.string(),
@@ -11,7 +12,11 @@ export const addFormSchema = z.object({
   code: z.string().min(1, "Issue Code is required!"),
   codeDuplicate: z.boolean().optional(),
   rarity: z.object({
-    name: z.string().min(1, "Rarity Name is required!"),
+    level: z
+      .number()
+      .int()
+      .min(1, "Rarity Level is required!")
+      .max(4, "Rarity Level cannot exceed 5!"),
     icon: z.string().min(1, "Rarity Icon is required!"),
   }),
   image: fileValidation(),
@@ -60,16 +65,24 @@ function checkFileType(
 
 export const defaultAddFromValues = () => {
   return useLocalStorage<Omit<AddFormSchemaType, "errors" | "releaseDate">>(
-    "defaultIssueFormValues",
+    "shuaDefaultAddFormValues",
     {
-      id: "1",
+      id: "22",
       name: "",
       group: "",
       era: "",
       code: "",
       codeDuplicate: false,
-      rarity: { name: "", icon: "" },
+      rarity: { level: 1, icon: "default" },
       image: new File([""], "filename"),
     }
   );
 };
+
+export function scrollToCarousel(api: CarouselApi, index: number) {
+  setTimeout(() => {
+    if (api) {
+      api?.scrollTo(index);
+    }
+  }, 0);
+}

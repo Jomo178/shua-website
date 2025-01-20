@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/carousel";
 
 import { AddFormSchemaType, defaultAddFromValues } from "./add";
+import AddButtonControl from "./add-button-control";
 import AddForm from "./add-form";
 
 interface AddCarouselProps {
@@ -29,7 +30,9 @@ export default function AddCarousel({
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
-  const [defaultFormValues, setDefaultFormValues] = defaultAddFromValues();
+  const [defaultFormValues] = defaultAddFromValues();
+  console.log(defaultFormValues);
+
   const [itemsFormPropsValue, setItemsFormPropsValue] = useState<
     AddFormSchemaType[]
   >([
@@ -39,6 +42,8 @@ export default function AddCarousel({
       errors: [],
     },
   ]);
+
+  console.log(itemsFormPropsValue, "sdj");
 
   useEffect(() => {
     if (!api) return;
@@ -53,15 +58,32 @@ export default function AddCarousel({
 
   return (
     <>
+      <AddButtonControl
+        currentUser={currentUser}
+        rarities={rarities}
+        eventReleaseDate={eventReleaseDate}
+        itmesFormPropsValue={itemsFormPropsValue}
+        setItemsFormPropsValueAction={setItemsFormPropsValue}
+        carouselCount={count}
+        carouselApi={api}
+        setCarouselCountAction={setCount}
+        setCarouselCurrentIndexAction={setCurrent}
+      />
       <Carousel setApi={setApi} className="w-full !max-w-xs sm:!max-w-sm">
         <CarouselContent>
           {itemsFormPropsValue?.map((itemsForm, index) => (
             <CarouselItem key={itemsForm.id}>
               <AddForm
+                index={index}
                 key={itemsForm.id}
                 defaultValues={itemsForm}
                 currentUser={currentUser}
                 rarities={rarities}
+                onFormChangeAction={(value) => {
+                  setItemsFormPropsValue((prev) =>
+                    prev.map((item, i) => (i === index ? value : item))
+                  );
+                }}
               />
             </CarouselItem>
           ))}
@@ -69,7 +91,10 @@ export default function AddCarousel({
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-      <div className="py-2 text-center text-sm text-muted-foreground">
+      <div
+        className="py-2 text-center text-sm text-muted-foreground"
+        onClick={() => console.log(itemsFormPropsValue)}
+      >
         issues {current} of {count}
       </div>
     </>
