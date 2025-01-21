@@ -20,6 +20,7 @@ import {
   scrollToCarousel,
 } from "./add";
 import { ItemsCustomPropertiesDialog } from "./add-custom-form";
+import AddItemsPreview from "./add-items-preview";
 
 interface AddButtonControlProps {
   itmesFormPropsValue: AddFormSchemaType[];
@@ -123,6 +124,12 @@ export default function AddButtonControl({
               <p>Custom Properties</p>
             </TooltipContent>
           </Tooltip>
+          <AddItemsPreview
+            itmesFormPropsValue={itmesFormPropsValue}
+            setItemsFormPropsValueAction={setItemsFormPropsValueAction}
+            carouselApi={carouselApi}
+            rarities={rarities}
+          />
         </div>
       </div>
 

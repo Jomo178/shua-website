@@ -80,3 +80,16 @@ export async function addRarity(formData: RarityFormSchemaType) {
 
   return { message: "Rarity added successfully!", rarity };
 }
+
+//TODO: Add the function to check for duplicated issue codes
+
+export async function checkForDuplicatedIssueCodes(
+  codes: string[]
+): Promise<string[]> {
+  const duplicatedCodes = await prisma.issues.findMany({
+    where: { code: { in: codes } },
+    select: { code: true },
+  });
+
+  return duplicatedCodes.map((issue) => issue.code);
+}

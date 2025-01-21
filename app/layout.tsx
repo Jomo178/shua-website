@@ -76,7 +76,7 @@ export const metadata = {
     shortcut: "/favicon-16x16.png",
     apple: "/apple-touch-icon.png",
   },
-  manifest: `${siteConfig.url}/site.webmanifest`,
+  manifest: `${siteConfig.url}site.webmanifest`,
 };
 
 export default async function RootLayout({
@@ -113,7 +113,16 @@ export default async function RootLayout({
             <Providers session={session}>
               <div vaul-drawer-wrapper="" className="bg-background">
                 {children}
-                <Toaster position="top-right" richColors />
+                <Toaster
+                  position="top-right"
+                  richColors
+                  toastOptions={{
+                    actionButtonStyle: {
+                      background: "hsl(var(--primary))",
+                      height: "2rem",
+                    },
+                  }}
+                />
                 <TailwindIndicator />
               </div>
             </Providers>

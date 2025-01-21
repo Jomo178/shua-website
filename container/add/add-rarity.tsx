@@ -12,6 +12,7 @@ import {
   Credenza,
   CredenzaBody,
   CredenzaContent,
+  CredenzaDescription,
   CredenzaFooter,
   CredenzaHeader,
   CredenzaTitle,
@@ -78,6 +79,9 @@ export default function AddRarity({
       <CredenzaContent className="md:max-w-sm">
         <CredenzaHeader>
           <CredenzaTitle>Add Rarity</CredenzaTitle>
+          <CredenzaDescription>
+            Add new Rarity to the database.
+          </CredenzaDescription>
         </CredenzaHeader>
         <CredenzaBody>
           <Form {...form}>

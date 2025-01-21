@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Rarity, Staff } from "@prisma/client";
 import { format } from "date-fns";
@@ -19,7 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { FloatingLabelInput } from "@/components/ui/input";
-import MultipleSelector, { Option } from "@/components/ui/multiselect";
+import { Option } from "@/components/ui/multiselect";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -29,6 +30,11 @@ import {
 
 import { addFormSchema, AddFormSchemaType } from "./add";
 import AddRarity from "./add-rarity";
+
+// TODO: fix this
+const NOSSRMULTISELECT = dynamic(() => import("@/components/ui/multiselect"), {
+  ssr: false,
+});
 
 interface AddFormProps {
   index: number;
@@ -47,7 +53,6 @@ export default function AddForm({
   hiddenFields = [],
   onFormChangeAction,
 }: AddFormProps) {
-  console.log("AddFormProps", defaultValues);
   const [isOpen, setIsOpen] = useState(false);
   const [raritiesState, setRarities] = useState<Rarity[]>(rarities);
   const form = useForm<AddFormSchemaType>({
@@ -62,7 +67,7 @@ export default function AddForm({
     defaultValues.errors?.find((error) => error?.path === fieldName)?.message ??
     "";
 
-  const [rarityArray] = useState<Option[]>([
+  const rarityArray = [
     { value: "xV", label: "Issue Level", disable: true },
     ...(Array.from({ length: 4 }, (_, i) => ({
       value: (i + 1).toString() + "_level",
@@ -75,7 +80,7 @@ export default function AddForm({
       label: toUpperCase(value.name),
       image: `https://cdn.discordapp.com/emojis/${value.icon.split(":")[2]?.replace(">", "")}.webp?size=44`,
     })),
-  ]);
+  ];
 
   return (
     <Form {...form}>
@@ -153,23 +158,33 @@ export default function AddForm({
                         <TooltipTrigger disabled className="cursor-pointer">
                           <Info size={16} />
                         </TooltipTrigger>
-                        <TooltipContent>
+                        <TooltipContent className="w-72">
                           {/* //TODO: fix this */}
-                          <p>Code is generated as follows:</p>
+                          <p className="mb-2 font-semibold">Code Generation:</p>
                           <ul className="ml-4 list-disc">
-                            <li>First and Last letters of Name</li>
-                            <li>First two letters of Act (no spaces)</li>
-                            <li>First two letters of Group (no spaces)</li>
-                            <li>Rarity number</li>
+                            <li>
+                              <strong>Group</strong>: First 3 letters (e.g., BTS
+                              → BTS).
+                            </li>
+                            <li>
+                              <strong>Version</strong>: 1, 2, 3, etc.
+                            </li>
+                            <li>
+                              <strong>Artist</strong>: First 2 letters (e.g.,
+                              Jimin → JM).
+                            </li>
+                            <li>
+                              <strong>Tier</strong>: 1, 2, 3, 4.
+                            </li>
+                            <li>
+                              <strong>Event</strong>: Add event initial before
+                              group name.
+                            </li>
                           </ul>
-                          <p>
-                            <code>
-                              Name: IU, Act: Last Fantasy, Group: Soloist,
-                              Rarity: 1
-                            </code>
-                          </p>
-                          <p>
-                            <code>Code: IULASO1</code>
+                          <p className="mt-2 font-medium">Examples:</p>
+                          <p className="font-mono">
+                            Regular: BTS1JM2 <br />
+                            Event: AIRJE
                           </p>
                         </TooltipContent>
                       </Tooltip>
@@ -197,7 +212,7 @@ export default function AddForm({
                       <FormItem className="w-full">
                         <FormLabel>Issue Rarity</FormLabel>
                         <FormControl>
-                          <MultipleSelector
+                          <NOSSRMULTISELECT
                             commandProps={{
                               label: "Select level",
                             }}
@@ -303,6 +318,8 @@ export default function AddForm({
                           }
                           onValueChange={(value) => {
                             form.setValue("image", value[0]);
+
+                            onFormChangeAction(form.getValues(), index);
                           }}
                         />
                       </FormControl>

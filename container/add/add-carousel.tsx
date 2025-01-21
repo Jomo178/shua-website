@@ -31,7 +31,6 @@ export default function AddCarousel({
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
   const [defaultFormValues] = defaultAddFromValues();
-  console.log(defaultFormValues);
 
   const [itemsFormPropsValue, setItemsFormPropsValue] = useState<
     AddFormSchemaType[]
@@ -42,8 +41,6 @@ export default function AddCarousel({
       errors: [],
     },
   ]);
-
-  console.log(itemsFormPropsValue, "sdj");
 
   useEffect(() => {
     if (!api) return;
@@ -91,10 +88,7 @@ export default function AddCarousel({
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-      <div
-        className="py-2 text-center text-sm text-muted-foreground"
-        onClick={() => console.log(itemsFormPropsValue)}
-      >
+      <div className="py-2 text-center text-sm text-muted-foreground">
         issues {current} of {count}
       </div>
     </>
