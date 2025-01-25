@@ -1,0 +1,39 @@
+"use server";
+
+import { addFormSchema, AddFormSchemaType } from "@/container/add/add";
+
+import { prisma } from "@/lib/database";
+
+import { utapi } from "./uploadthing";
+
+export async function addIssues(
+  formData: AddFormSchemaType
+): Promise<{ message: string; variant: "success" | "error" }> {
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  const validatedFields = addFormSchema.safeParse(formData);
+  if (!validatedFields.success) {
+    return { message: "Not valid Data.", variant: "error" };
+  }
+
+  const uploadImage = await utapi.uploadFiles(formData.image);
+
+  if (uploadImage.error?.code || !uploadImage.data) {
+    return { message: "Image upload failed.", variant: "error" };
+  }
+
+  const createPendingIssue = await prisma.pendingIssues.create({
+    data: {
+      name: formData.name,
+      era: formData.era,
+      group: formData.group,
+      code: formData.code,
+      rarity: formData.rarity,
+      image: uploadImage.data.url,
+      createdById: formData.createdById,
+      eventId: formData.eventId,
+      droppable: true,
+    },
+  });
+
+  return { message: "successfully added!", variant: "success" };
+}

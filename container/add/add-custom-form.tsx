@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Rarity, Staff } from "@prisma/client";
+import { Events, Rarity, Staff } from "@prisma/client";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ interface ItemsCustomPropertiesDialogProps {
   >;
   openDialog: boolean;
   setOpenDialogAction: React.Dispatch<React.SetStateAction<boolean>>;
+  event: Events;
 }
 
 export function ItemsCustomPropertiesDialog({
@@ -39,6 +40,7 @@ export function ItemsCustomPropertiesDialog({
   setNewCustomPropsAction,
   openDialog,
   setOpenDialogAction,
+  event,
 }: ItemsCustomPropertiesDialogProps) {
   const [itemsFormPropsValue, setItemsFormPropsValue] =
     useState<AddFormSchemaType>(getNewCustomProps);
@@ -77,6 +79,7 @@ export function ItemsCustomPropertiesDialog({
           rarities={rarities}
           defaultValues={getNewCustomProps}
           currentUser={currentUser}
+          event={event}
           onFormChangeAction={(value, index) => {
             setItemsFormPropsValue((prev) => {
               const updatedValue = { ...prev, ...value };

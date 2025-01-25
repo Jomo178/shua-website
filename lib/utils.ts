@@ -1,5 +1,8 @@
+import { AuthorizationType, Staff } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+
+import { AuthorizationAction } from "@/types/view";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -51,4 +54,40 @@ export function formatDistanceToNow(
   }
 
   return "just now";
+}
+
+export async function urlToFile(
+  url: string,
+  filename: string,
+  mimeType: string
+): Promise<File & { preview: string }> {
+  try {
+    const response = await fetch(url, { mode: "cors" });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
+    const blob = await response.blob();
+    const file = new File([blob], filename, {
+      type: mimeType,
+      lastModified: Date.now(),
+    });
+    (file as any).preview = url;
+    return file as File & { preview: string };
+  } catch (error) {
+    console.error("Error converting URL to file:", error);
+    throw error;
+  }
+}
+
+export function hasPermission(
+  staff: Staff,
+  resourceAccessPermission: `${AuthorizationAction}:${AuthorizationType}`
+) {
+  const action = resourceAccessPermission.split(":")[0] as AuthorizationAction;
+
+  const permissionType = resourceAccessPermission.split(
+    ":"
+  )[1] as AuthorizationType;
+
+  return !staff[action].includes(permissionType);
 }

@@ -4,7 +4,7 @@ import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import {
   rarityFormSchema,
   RarityFormSchemaType,
-} from "@/container/add/add-rarity";
+} from "@/container/event/event";
 import { StaffTableItems } from "@/container/staff/staff-columns";
 
 import { prisma } from "@/lib/database";
@@ -44,6 +44,19 @@ export const getStaffAllInformation = unstable_cache(
   { revalidate: 60 * 60 * 24, tags: ["staff"] }
 );
 
+export const getStaffIds = unstable_cache(
+  async () => {
+    return await prisma.staff.findMany({
+      select: {
+        id: true,
+        discordId: true,
+      },
+    });
+  },
+  ["/staff"],
+  { revalidate: 60 * 60 * 24, tags: ["staff"] }
+);
+
 export const getAllRarities = unstable_cache(
   async () => {
     const rarities = await prisma.rarity.findMany();
@@ -55,6 +68,7 @@ export const getAllRarities = unstable_cache(
 
 export async function addRarity(formData: RarityFormSchemaType) {
   const validatedFields = rarityFormSchema.safeParse(formData);
+
   if (!validatedFields.success) {
     return { message: "Not valid Data." };
   }
@@ -81,15 +95,24 @@ export async function addRarity(formData: RarityFormSchemaType) {
   return { message: "Rarity added successfully!", rarity };
 }
 
-//TODO: Add the function to check for duplicated issue codes
-
 export async function checkForDuplicatedIssueCodes(
   codes: string[]
 ): Promise<string[]> {
-  const duplicatedCodes = await prisma.issues.findMany({
-    where: { code: { in: codes } },
-    select: { code: true },
-  });
+  const [duplicatedCodes, pendingIssues] = await Promise.all([
+    prisma.issues.findMany({
+      where: { code: { in: codes } },
+      select: { code: true },
+    }),
+    prisma.pendingIssues.findMany({
+      where: { code: { in: codes } },
+      select: { code: true },
+    }),
+  ]);
 
-  return duplicatedCodes.map((issue) => issue.code);
+  const allDuplicatedCodes = [
+    ...duplicatedCodes.map((issue) => issue.code),
+    ...pendingIssues.map((issue) => issue.code),
+  ];
+
+  return allDuplicatedCodes;
 }

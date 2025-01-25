@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Rarity, Staff } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,13 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { addRarity } from "@/app/(dashboard)/dashboard/action";
 
-export const rarityFormSchema = z.object({
-  name: z.string().nonempty("Name is required"),
-  icon: z.string().nonempty("Icon is required"),
-  createdById: z.string().nonempty("Created By is required"),
-});
-
-export type RarityFormSchemaType = z.infer<typeof rarityFormSchema>;
+import { rarityFormSchema, RarityFormSchemaType } from "../event/event";
 
 interface AddRarityProps {
   currentUser: Staff;

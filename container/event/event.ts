@@ -12,3 +12,11 @@ export const eventFormSchema = z.object({
 });
 
 export type EventFormSchemaType = z.infer<typeof eventFormSchema>;
+
+export const rarityFormSchema = z.object({
+  name: z.string().nonempty("Name is required"),
+  icon: z.string().nonempty("Icon is required"),
+  createdById: z.string().nonempty("Created By is required"),
+});
+
+export type RarityFormSchemaType = z.infer<typeof rarityFormSchema>;

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Rarity, Staff } from "@prisma/client";
+import { Events, Rarity, Staff } from "@prisma/client";
 import { format } from "date-fns";
 import { CalendarIcon, Info, Star } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -40,6 +40,7 @@ interface AddFormProps {
   index: number;
   currentUser: Staff;
   rarities: Rarity[];
+  event: Events;
   defaultValues?: AddFormSchemaType;
   hiddenFields?: (keyof AddFormSchemaType)[];
   onFormChangeAction: (form: AddFormSchemaType, index: number) => void;
@@ -49,6 +50,7 @@ export default function AddForm({
   index,
   currentUser,
   rarities,
+  event,
   defaultValues = {} as any,
   hiddenFields = [],
   onFormChangeAction,
@@ -57,7 +59,11 @@ export default function AddForm({
   const [raritiesState, setRarities] = useState<Rarity[]>(rarities);
   const form = useForm<AddFormSchemaType>({
     resolver: zodResolver(addFormSchema),
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      createdById: currentUser.id,
+      eventId: event.id,
+    },
   });
 
   const isFieldHidden = (fieldName: keyof AddFormSchemaType) =>

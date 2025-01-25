@@ -15,7 +15,7 @@ import {
 
 import { Button } from "./ui/button";
 
-function Navbar() {
+function Navbar({ sidebarToggle }: { sidebarToggle?: React.ReactNode }) {
   const { data: session } = useSession();
   const { setTheme, resolvedTheme } = useTheme();
 
@@ -36,6 +36,7 @@ function Navbar() {
       <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 justify-between">
           <div className="flex flex-shrink-0 items-center">
+            {sidebarToggle}
             <Image
               src="/images/shua.png"
               alt="Shua Bot"

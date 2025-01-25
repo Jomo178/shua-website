@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Rarity, Staff } from "@prisma/client";
+import { Events, Rarity, Staff } from "@prisma/client";
 
 import {
   Carousel,
@@ -19,13 +19,13 @@ import AddForm from "./add-form";
 interface AddCarouselProps {
   rarities: Rarity[];
   currentUser: Staff;
-  eventReleaseDate: Date;
+  event: Events;
 }
 
 export default function AddCarousel({
   rarities,
   currentUser,
-  eventReleaseDate,
+  event,
 }: AddCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -37,7 +37,7 @@ export default function AddCarousel({
   >([
     {
       ...defaultFormValues,
-      releaseDate: new Date(eventReleaseDate).toISOString(),
+      releaseDate: new Date(event.start).toISOString(),
       errors: [],
     },
   ]);
@@ -58,7 +58,7 @@ export default function AddCarousel({
       <AddButtonControl
         currentUser={currentUser}
         rarities={rarities}
-        eventReleaseDate={eventReleaseDate}
+        event={event}
         itmesFormPropsValue={itemsFormPropsValue}
         setItemsFormPropsValueAction={setItemsFormPropsValue}
         carouselCount={count}
@@ -75,6 +75,7 @@ export default function AddCarousel({
                 key={itemsForm.id}
                 defaultValues={itemsForm}
                 currentUser={currentUser}
+                event={event}
                 rarities={rarities}
                 onFormChangeAction={(value) => {
                   setItemsFormPropsValue((prev) =>

@@ -13,16 +13,18 @@ import { AnimatePresence, motion, useSpring } from "framer-motion";
 import {
   CheckCircle2,
   Clock,
-  GitBranch,
   Menu,
   MessageSquare,
   StepForwardIcon as Progress,
-  Star,
   Users,
 } from "lucide-react";
 
 import { EventsWithRelation } from "@/types/prisma-relations";
-import { formatDistanceToNow, formatTimestamp } from "@/lib/utils";
+import {
+  formatDistanceToNow,
+  formatTimestamp,
+  hasPermission,
+} from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +34,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { Icons } from "@/components/ui/icons";
 import { Progress as ProgressBar } from "@/components/ui/progress";
 import {
   Tooltip,
@@ -40,18 +43,21 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+import { StaffTableItems } from "../staff/staff-columns";
 import { EventEdit } from "./event-actions";
 
 interface EventCardProps {
   currentUser: Staff;
   event: EventsWithRelation;
   setEventStateAction: Dispatch<SetStateAction<EventsWithRelation[]>>;
+  allStaffInformation: StaffTableItems[];
 }
 
 export default function EventCard({
   currentUser,
   setEventStateAction,
   event,
+  allStaffInformation,
 }: EventCardProps) {
   const { isExpanded, toggleExpand, animatedHeight } = useExpandable();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -65,19 +71,57 @@ export default function EventCard({
 
   let progress = 0;
 
-  let contributors: any = [
-    { name: "Emma" },
-    { name: "John" },
-    { name: "Lisa" },
-    { name: "David" },
-  ];
+  let contributors: any = [...event.issues, ...event.pendingIssues].map(
+    (issue) => {
+      let contributor = allStaffInformation.find(
+        (staff) => staff.id === issue.createdById
+      );
+      if (contributor) {
+        return {
+          name: contributor.name,
+          image: contributor.image,
+        };
+      }
+    }
+  );
 
-  let tasks = [
-    { title: "Create a new design", completed: true },
-    { title: "Update the documentation", completed: true },
-    { title: "Fix the issue", completed: false },
-    { title: "Push the changes", completed: false },
-  ];
+  let changes = [...event.issues, ...event.pendingIssues]
+    .flatMap((issue) => {
+      return [
+        {
+          action: "created",
+          date: issue.createdAt,
+          by:
+            allStaffInformation.find((staff) => staff.id === issue.createdById)
+              ?.name || "Unknown",
+          name: issue.name,
+        },
+        {
+          action: "updated",
+          date: issue.updatedAt,
+          by: "System",
+          name: issue.name,
+        },
+        {
+          action: "approved",
+          date: issue.approvedAt,
+          by:
+            allStaffInformation.find((staff) => staff.id === issue.createdById)
+              ?.name || "Unknown",
+          name: issue.name,
+        },
+      ];
+    })
+    .filter((change) => change.date)
+    .sort(
+      (a, b) =>
+        new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
+    )
+    .slice(0, 5)
+    .map(
+      (change) =>
+        `${change.name} was ${change.action} by ${change.by} on ${change.date ? new Date(change.date).toLocaleDateString() : "Unknown date"}`
+    );
 
   return (
     <Card
@@ -99,26 +143,25 @@ export default function EventCard({
             </Badge>
             <h3 className="text-2xl font-semibold">{event.name}</h3>
           </div>
-          <TooltipProvider delayDuration={100}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="h-8 w-8"
-                  onClick={() => {
-                    toggleExpand();
-                    setIsOpen(true);
-                  }}
-                >
-                  <Menu className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Edit</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="outline"
+                className="h-8 w-8"
+                disabled={hasPermission(currentUser, "edit:event")}
+                onClick={() => {
+                  toggleExpand();
+                  setIsOpen(true);
+                }}
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Edit</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </CardHeader>
       <CardContent>
@@ -152,12 +195,21 @@ export default function EventCard({
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="flex items-center">
-                          <Star className="mr-1 h-4 w-4 text-yellow-400" />
-                          <span>{0}</span>
+                          <Icons.approve className="mr-1 h-4 w-4 text-yellow-400" />
+                          <span>
+                            {
+                              [...event.pendingIssues, ...event.issues].map(
+                                (x) => x.approvedAt != null
+                              ).length
+                            }
+                          </span>
                         </div>
                         <div className="flex items-center">
-                          <GitBranch className="mr-1 h-4 w-4" />
-                          <span>{0} issues</span>
+                          <Icons.addIssue className="mr-1 h-4 w-4" />
+                          <span>
+                            {event.issues.length + event.pendingIssues.length}{" "}
+                            Issues
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -195,16 +247,15 @@ export default function EventCard({
                     </div>
 
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Recent Tasks</h4>
-                      {tasks.map((task, index) => (
+                      <h4 className="text-sm font-medium">Recent Changes</h4>
+                      {changes.map((task, index) => (
                         <div
                           key={index}
                           className="flex items-center justify-between text-sm"
                         >
-                          <span className="text-gray-600">{task.title}</span>
-                          {task.completed && (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                          )}
+                          <span className="text-gray-600">{task}</span>
+
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
                         </div>
                       ))}
                     </div>
@@ -238,7 +289,10 @@ export default function EventCard({
               addSuffix: true,
             })}
           </span>
-          <span>{0} approved issues</span>
+          <span>
+            {event.pendingIssues.map((x) => x.approvedAt != null).length}{" "}
+            approved issues
+          </span>
         </div>
       </CardFooter>
     </Card>

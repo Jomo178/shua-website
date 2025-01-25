@@ -5,6 +5,8 @@ import { CarouselApi } from "@/components/ui/carousel";
 
 export const addFormSchema = z.object({
   id: z.string(),
+  createdById: z.string().min(1, "Created By ID is required!"),
+  eventId: z.string().min(1, "Event ID is required!"),
   name: z.string().min(1, "Issue Name is required!"),
   releaseDate: z.string().datetime(),
   era: z.string().min(1, "Issue Era is required!"),
@@ -68,6 +70,8 @@ export const defaultAddFromValues = () => {
     "shuaDefaultAddFormValues",
     {
       id: "22",
+      createdById: "",
+      eventId: "",
       name: "",
       group: "",
       era: "",

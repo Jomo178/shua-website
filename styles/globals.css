@@ -29,6 +29,14 @@
     --chart-4: 90 50% 50%;
     --chart-5: 150 60% 50%;
     --radius: 0.5rem;
+    --sidebar-background: 120 20% 85%;
+    --sidebar-foreground: 120 40% 10%;
+    --sidebar-primary: 120 50% 30%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 120 30% 90%;
+    --sidebar-accent-foreground: 120 40% 10%;
+    --sidebar-border: 120 30% 70%;
+    --sidebar-ring: 120 50% 30%;
   }
   .dark {
     --background: 120 40% 10%;
@@ -55,6 +63,14 @@
     --chart-3: 120 40% 60%;
     --chart-4: 90 50% 50%;
     --chart-5: 150 60% 50%;
+    --sidebar-background: 120 40% 15%;
+    --sidebar-foreground: 120 20% 85%;
+    --sidebar-primary: 120 50% 30%;
+    --sidebar-primary-foreground: 120 20% 94%;
+    --sidebar-accent: 120 30% 40%;
+    --sidebar-accent-foreground: 120 20% 94%;
+    --sidebar-border: 120 30% 30%;
+    --sidebar-ring: 120 50% 50%;
   }
 }
 
@@ -68,12 +84,12 @@
   }
 
   ::-webkit-scrollbar-track {
-    background-color: "#202225";
+    background-color: hsl(var(--sidebar-background));
   }
 
   ::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: grey;
+    background-color: hsl(var(--sidebar-primary));
   }
 
   ::-webkit-scrollbar {

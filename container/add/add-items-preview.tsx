@@ -2,13 +2,26 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { Rarity } from "@prisma/client";
-import { Eye, Star } from "lucide-react";
+import { addIssues } from "@/server/add-action";
+import { Rarity, Staff } from "@prisma/client";
+import { CloudUpload, Eye, Loader2, Star } from "lucide-react";
 import { toast } from "sonner";
 
+import { cn, hasPermission } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CarouselApi } from "@/components/ui/carousel";
+import {
+  Credenza,
+  CredenzaBody,
+  CredenzaContent,
+  CredenzaDescription,
+  CredenzaFooter,
+  CredenzaHeader,
+  CredenzaTitle,
+} from "@/components/ui/credenza";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
@@ -16,7 +29,6 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import {
   Tooltip,
@@ -32,17 +44,30 @@ interface AddItemsPreviewProps {
   setItemsFormPropsValueAction: React.Dispatch<
     React.SetStateAction<AddFormSchemaType[]>
   >;
+  defaultValues: AddFormSchemaType;
   carouselApi: CarouselApi;
   rarities: Rarity[];
+  currentUser: Staff;
 }
 
-function AddItemsPreview({
+export default function AddItemsPreview({
   itmesFormPropsValue,
   setItemsFormPropsValueAction,
+  defaultValues,
   carouselApi,
   rarities,
+  currentUser,
 }: AddItemsPreviewProps) {
   const [openDialog, setOpenDialog] = useState(false);
+  const [openUpload, setOpenUpload] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadingProgress, setUploadingProgress] = useState(0);
+  const [uploadingResponse, setUploadingResponse] = useState<
+    {
+      variant: "success" | "error";
+      message?: string;
+    }[]
+  >([]);
 
   const openPreview = async () => {
     const formErrors = itmesFormPropsValue.map((item, index) => {
@@ -139,11 +164,57 @@ function AddItemsPreview({
     setOpenDialog(true);
   };
 
+  const onSubmit = async () => {
+    setOpenUpload(true);
+    setIsUploading(true);
+
+    const uploadPromises = itmesFormPropsValue.map((item, index) =>
+      addIssues(item)
+        .then(({ message, variant }) => {
+          setUploadingProgress(
+            ((index + 1) / itmesFormPropsValue.length) * 100
+          );
+          return {
+            variant,
+            message,
+          };
+        })
+        .catch((error) => {
+          return {
+            variant: "error" as const,
+            message: error.message as string,
+          };
+        })
+    );
+
+    console.time("uploading");
+    const responses = await Promise.all(uploadPromises);
+    setUploadingResponse(responses);
+    console.timeEnd("uploading");
+
+    const failedItems = itmesFormPropsValue.filter(
+      (_, index) => responses[index].variant === "error"
+    );
+
+    setItemsFormPropsValueAction(() =>
+      failedItems.length > 0
+        ? failedItems
+        : [{ ...defaultValues, id: Math.random().toString() }]
+    );
+
+    setOpenDialog(false);
+    setIsUploading(false);
+  };
+
   return (
     <>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button variant="outline" onClick={openPreview}>
+          <Button
+            variant="outline"
+            onClick={openPreview}
+            disabled={hasPermission(currentUser, "create:issues")}
+          >
             <Eye size={24} />
           </Button>
         </TooltipTrigger>
@@ -151,6 +222,60 @@ function AddItemsPreview({
           <p>Upload Preview</p>
         </TooltipContent>
       </Tooltip>
+
+      <Credenza open={openUpload} onOpenChange={setOpenUpload}>
+        <CredenzaContent className="sm:max-w-[600px]">
+          <CredenzaHeader>
+            <CredenzaTitle>Uploading Issues</CredenzaTitle>
+            <CredenzaDescription>
+              {isUploading
+                ? `Uploading the issues. Please wait until the process is complete.`
+                : `All issues have been uploaded successfully.`}
+            </CredenzaDescription>
+          </CredenzaHeader>
+          <CredenzaBody className="my-4 flex flex-col items-center space-y-4">
+            {isUploading && (
+              <div className="flex flex-row items-center gap-4">
+                <Loader2 className="animate-spin" size={32} />
+                <p>Uploading</p>
+              </div>
+            )}
+            <div className="flex w-full items-center gap-4">
+              <Progress value={uploadingProgress} className="h-4 w-full" />
+              <p>{uploadingProgress.toPrecision(3)}%</p>
+            </div>
+            <ScrollArea className="h-48 w-full text-center">
+              {uploadingResponse.map((item, index) => (
+                <p
+                  key={index}
+                  className={cn(
+                    "!mt-0 mb-1 leading-7 [&:not(:first-child)]:mt-6",
+                    item.variant === "error" && "text-red-500",
+                    item.variant === "success" && "text-green-500"
+                  )}
+                >
+                  {item.variant === "success"
+                    ? `Issues ${index + 1} ${item.message}`
+                    : `Issues ${index + 1} ${item.message}`}
+                </p>
+              ))}
+            </ScrollArea>
+          </CredenzaBody>
+          <CredenzaFooter className="flex flex-row justify-center">
+            <Button
+              isLoading={isUploading}
+              onClick={() => {
+                setOpenUpload(false);
+                setOpenDialog(false);
+                setUploadingProgress(0);
+                setUploadingResponse([]);
+              }}
+            >
+              Close
+            </Button>
+          </CredenzaFooter>
+        </CredenzaContent>
+      </Credenza>
 
       <Sheet open={openDialog} onOpenChange={setOpenDialog}>
         <SheetContent className="!w-full p-4 sm:max-w-none">
@@ -166,17 +291,15 @@ function AddItemsPreview({
                 <CardPreview item={item} rarities={rarities} key={item.id} />
               );
             })}
-            {/* <div className="flex flex-row sm:col-span-2 md:col-span-4 md:justify-end">
-              <Button
-                variant="expandIcon"
-                className="mb-4 w-full md:mr-8 md:w-auto"
-                onClick={() => onSubmitAction()}
-                Icon={Icons.upload}
-                iconPlacement="right"
-              >
-                Upload {toUpperCase(itemNameType)}
-              </Button> */}
-            {/* </div> */}
+          </div>
+          <div className="flex flex-row sm:col-span-2 md:col-span-4 md:justify-end">
+            <Button
+              className="mb-4 w-full md:mr-8 md:w-auto"
+              onClick={onSubmit}
+            >
+              <CloudUpload />
+              Upload Issues
+            </Button>
           </div>
         </SheetContent>
       </Sheet>
@@ -286,5 +409,3 @@ function TextInformation({
     </div>
   );
 }
-
-export default AddItemsPreview;

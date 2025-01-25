@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { EventsWithRelation } from "@/types/prisma-relations";
+import { hasPermission } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 import { eventFormSchema, EventFormSchemaType } from "./event";
@@ -53,7 +54,12 @@ export function EventAdd({ currentUser, setEventStateAction }: EventAddProps) {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>Add Event</Button>
+      <Button
+        onClick={() => setIsOpen(true)}
+        disabled={hasPermission(currentUser, "create:event")}
+      >
+        Add Event
+      </Button>
       <EventForm
         form={form}
         isOpen={isOpen}

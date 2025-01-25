@@ -5,19 +5,21 @@ import { Staff } from "@prisma/client";
 
 import { EventsWithRelation } from "@/types/prisma-relations";
 
+import { StaffTableItems } from "../staff/staff-columns";
 import { EventAdd } from "./event-actions";
 import EventCard from "./event-card";
 
 interface EventsListProps {
   currentUser: Staff;
   events: EventsWithRelation[];
+  allStaffInformation: StaffTableItems[];
 }
 
-function EventsList({ currentUser, events }: EventsListProps) {
-  //   if (events.length == 0) {
-  //     return <div>No events found.</div>;
-  //   }
-
+function EventsList({
+  currentUser,
+  events,
+  allStaffInformation,
+}: EventsListProps) {
   const [eventState, setEventState] = useState<EventsWithRelation[]>(events);
   const currentDate = new Date();
   const currentEvents = eventState.filter(
@@ -70,6 +72,7 @@ function EventsList({ currentUser, events }: EventsListProps) {
                 event={event}
                 setEventStateAction={setEventState}
                 currentUser={currentUser}
+                allStaffInformation={allStaffInformation}
                 key={index}
               />
             ))}
@@ -84,6 +87,7 @@ function EventsList({ currentUser, events }: EventsListProps) {
                 event={nextEvent}
                 setEventStateAction={setEventState}
                 currentUser={currentUser}
+                allStaffInformation={allStaffInformation}
               />
             </div>
           </section>
@@ -101,6 +105,7 @@ function EventsList({ currentUser, events }: EventsListProps) {
                 event={event}
                 setEventStateAction={setEventState}
                 currentUser={currentUser}
+                allStaffInformation={allStaffInformation}
                 key={index}
               />
             ))}

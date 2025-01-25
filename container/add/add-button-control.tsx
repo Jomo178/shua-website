@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Rarity, Staff } from "@prisma/client";
+import { Events, Rarity, Staff } from "@prisma/client";
 import { MixerHorizontalIcon } from "@radix-ui/react-icons";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -32,7 +32,7 @@ interface AddButtonControlProps {
   setCarouselCountAction: React.Dispatch<React.SetStateAction<number>>;
   setCarouselCurrentIndexAction: React.Dispatch<React.SetStateAction<number>>;
   currentUser: Staff;
-  eventReleaseDate: Date;
+  event: Events;
   rarities: Rarity[];
 }
 
@@ -44,7 +44,7 @@ export default function AddButtonControl({
   setCarouselCountAction,
   setCarouselCurrentIndexAction,
   currentUser,
-  eventReleaseDate,
+  event,
   rarities,
 }: AddButtonControlProps) {
   const [openDialog, setOpenDialog] = useState(false);
@@ -95,7 +95,7 @@ export default function AddButtonControl({
                     {
                       ...getNewCustomProps,
                       id: Math.random().toString(),
-                      releaseDate: new Date(eventReleaseDate).toISOString(),
+                      releaseDate: new Date(event.start).toISOString(),
                       errors: [],
                     },
                   ]);
@@ -127,8 +127,14 @@ export default function AddButtonControl({
           <AddItemsPreview
             itmesFormPropsValue={itmesFormPropsValue}
             setItemsFormPropsValueAction={setItemsFormPropsValueAction}
+            defaultValues={{
+              ...getNewCustomProps,
+              releaseDate: new Date(event.start).toISOString(),
+              errors: [],
+            }}
             carouselApi={carouselApi}
             rarities={rarities}
+            currentUser={currentUser}
           />
         </div>
       </div>
@@ -141,10 +147,11 @@ export default function AddButtonControl({
         setOpenDialogAction={setOpenDialog}
         getNewCustomProps={{
           ...getNewCustomProps,
-          releaseDate: new Date(eventReleaseDate).toISOString(),
+          releaseDate: new Date(event.start).toISOString(),
           errors: [],
         }}
         setNewCustomPropsAction={setNewCustomProps as any}
+        event={event}
       />
     </>
   );

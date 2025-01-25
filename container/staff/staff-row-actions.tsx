@@ -2,10 +2,12 @@
 
 import { Dispatch, SetStateAction, useState } from "react";
 import { archiveStaff } from "@/server/staff-action";
+import { Staff } from "@prisma/client";
 import { Row } from "@tanstack/react-table";
 import { Ellipsis } from "lucide-react";
 import { toast } from "sonner";
 
+import { hasPermission } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,9 +24,11 @@ import { StaffTableItems } from "./staff-columns";
 export function RowActions({
   row,
   setDataAction,
+  currentUser,
 }: {
   row: Row<StaffTableItems>;
   setDataAction: Dispatch<SetStateAction<StaffTableItems[]>>;
+  currentUser: Staff | undefined;
 }) {
   const [modalOpen, setModalOpen] = useState(false);
   return (
@@ -44,11 +48,19 @@ export function RowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => setModalOpen(true)}>
+            <DropdownMenuItem
+              disabled={
+                currentUser ? hasPermission(currentUser, "edit:staff") : true
+              }
+              onClick={() => setModalOpen(true)}
+            >
               <span>Edit</span>
               <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem
+              disabled={
+                currentUser ? hasPermission(currentUser, "handle:staff") : true
+              }
               onClick={() => {
                 toast.promise(
                   archiveStaff(row.original.discordId, row.original.isInTeam),

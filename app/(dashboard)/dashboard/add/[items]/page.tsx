@@ -54,7 +54,7 @@ export default async function Page({
               <AddCarousel
                 rarities={rarities}
                 currentUser={getCurrentStaff.staff}
-                eventReleaseDate={issueEvent?.start}
+                event={issueEvent}
               />
             )}
           </CardContent>

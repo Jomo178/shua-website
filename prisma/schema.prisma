@@ -74,8 +74,14 @@ model Staff {
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
 
-  createdEvents Events[] @relation("event_createdBy")
-  Rarity        Rarity[] @relation("rarity_createdBy")
+  createdEvents         Events[]        @relation("event_createdBy")
+  rarities              Rarity[]        @relation("rarity_createdBy")
+  createdPendingIssues  PendingIssues[] @relation("PendingIssuesCreatedBy")
+  approvedPendingIssues PendingIssues[] @relation("PendingIssuesApprovedBy")
+  rejections            Rejections[]    @relation("RejectionsRejectedBy")
+  resubmittedRejections Rejections[]    @relation("RejectionsResubmittedBy")
+  approvedIssues        Issues[]        @relation("IssuesApprovedBy")
+  createdIssues         Issues[]        @relation("IssuesCreatedBy")
 
   @@map("staff")
 }
@@ -92,18 +98,51 @@ enum StaffRole {
 }
 
 model Issues {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  era       String
-  group     String
-  rarity    Json
-  code      String
-  image     String
-  droppable Boolean
-  createdAt DateTime
-  updatedAt DateTime @updatedAt
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  era          String
+  group        String
+  rarity       Json
+  code         String
+  image        String
+  droppable    Boolean
+  createdAt    DateTime
+  updatedAt    DateTime  @updatedAt
+  eventId      String?   @db.ObjectId
+  createdById  String?   @db.ObjectId
+  approvedById String?   @db.ObjectId
+  approvedAt   DateTime?
+
+  rejections Rejections[] @relation("RejectionsIssue")
+  createdBy  Staff?       @relation(fields: [createdById], references: [id], name: "IssuesCreatedBy")
+  approvedBy Staff?       @relation(fields: [approvedById], references: [id], name: "IssuesApprovedBy")
+  event      Events?      @relation(fields: [eventId], references: [id], name: "IssuesEvent")
 
   @@map("issues")
+}
+
+model PendingIssues {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  era          String
+  group        String
+  rarity       Json
+  code         String
+  image        String
+  eventId      String    @db.ObjectId
+  droppable    Boolean
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  createdById  String    @db.ObjectId
+  approvedById String?   @db.ObjectId
+  approvedAt   DateTime?
+
+  createdBy  Staff        @relation(fields: [createdById], references: [id], name: "PendingIssuesCreatedBy")
+  approvedBy Staff?       @relation(fields: [approvedById], references: [id], name: "PendingIssuesApprovedBy")
+  event      Events       @relation(fields: [eventId], references: [id], name: "PendingIssuesEvent")
+  rejections Rejections[] @relation("RejectionsPendingIssue")
+
+  @@map("pending_issues")
 }
 
 model Rarity {
@@ -115,6 +154,8 @@ model Rarity {
   createdById String   @db.ObjectId
 
   createdBy Staff @relation(fields: [createdById], references: [id], name: "rarity_createdBy")
+
+  @@map("rarities")
 }
 
 model Events {
@@ -127,9 +168,33 @@ model Events {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  createdBy Staff @relation(fields: [createdById], references: [id], name: "event_createdBy")
+  createdBy     Staff           @relation(fields: [createdById], references: [id], name: "event_createdBy")
+  pendingIssues PendingIssues[] @relation("PendingIssuesEvent")
+  issues        Issues[]        @relation("IssuesEvent")
+
+  @@map("events")
 }
 
 enum ItemsType {
   issues
+}
+
+model Rejections {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  reason          String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  rejectedById    String    @db.ObjectId
+  resubmitted     Boolean   @default(false)
+  resubmittedAt   DateTime?
+  resubmittedById String?   @db.ObjectId
+  issuesId        String?   @db.ObjectId
+  pendingIssuesId String?   @db.ObjectId
+
+  rejectedBy    Staff          @relation(fields: [rejectedById], references: [id], name: "RejectionsRejectedBy")
+  resubmittedBy Staff?         @relation(fields: [resubmittedById], references: [id], name: "RejectionsResubmittedBy")
+  issues        Issues?        @relation(fields: [issuesId], references: [id], name: "RejectionsIssue")
+  pendingIssues PendingIssues? @relation(fields: [pendingIssuesId], references: [id], name: "RejectionsPendingIssue")
+
+  @@map("rejections")
 }

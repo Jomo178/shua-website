@@ -3,6 +3,7 @@
 import { useId, useMemo, useRef, useState } from "react";
 import { staffColumns, StaffTableItems } from "@/container/staff/staff-columns";
 import { StaffTableHeader } from "@/container/staff/staff-header";
+import { Staff } from "@prisma/client";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -26,7 +27,7 @@ import {
 } from "lucide-react";
 
 import { prisma } from "@/lib/database";
-import { cn } from "@/lib/utils";
+import { cn, hasPermission } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,8 +61,10 @@ import { StaffAdd } from "./staff-actions";
 
 export default function StaffTable({
   staffItems,
+  currentUser,
 }: {
   staffItems: StaffTableItems[];
+  currentUser: Staff;
 }) {
   const id = useId();
   const [modalOpen, setModalOpen] = useState(false);
@@ -113,6 +116,7 @@ export default function StaffTable({
     },
     meta: {
       setDataAction: setData,
+      curentUser: currentUser,
     },
   });
 
@@ -285,7 +289,7 @@ export default function StaffTable({
         </div>
         <div className="flex items-center gap-3">
           {/* Delete button */}
-          {table.getSelectedRowModel().rows.length > 0 && (
+          {/* {table.getSelectedRowModel().rows.length > 0 && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button className="ml-auto" variant="outline">
@@ -335,12 +339,13 @@ export default function StaffTable({
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          )}
+          )} */}
           {/* Add user button */}
           <Button
             className="ml-auto"
             variant="outline"
             onClick={() => setModalOpen(true)}
+            disabled={hasPermission(currentUser, "create:staff")}
           >
             <Plus
               className="-ms-1 me-2 opacity-60"

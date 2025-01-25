@@ -8,10 +8,12 @@ import { EventsWithRelation } from "@/types/prisma-relations";
 import { prisma } from "@/lib/database";
 
 export const getAllEvents = unstable_cache(
-  async () => {
+  async (): Promise<EventsWithRelation[]> => {
     const events = await prisma.events.findMany({
       include: {
         createdBy: true,
+        issues: true,
+        pendingIssues: true,
       },
     });
 
@@ -22,11 +24,13 @@ export const getAllEvents = unstable_cache(
 );
 
 export const getCurrentEvent = unstable_cache(
-  async (items: ItemsType[]) => {
+  async (items: ItemsType[]): Promise<EventsWithRelation | null> => {
     const event = await prisma.events.findFirst({
       where: { itemsReleaseType: { in: items } },
       include: {
         createdBy: true,
+        issues: true,
+        pendingIssues: true,
       },
     });
 
@@ -62,6 +66,8 @@ export async function addEvent(
     },
     include: {
       createdBy: true,
+      issues: true,
+      pendingIssues: true,
     },
   });
 
@@ -100,6 +106,8 @@ export async function editEvent(
     },
     include: {
       createdBy: true,
+      issues: true,
+      pendingIssues: true,
     },
   });
 

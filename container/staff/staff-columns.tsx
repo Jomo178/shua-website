@@ -169,6 +169,7 @@ export const staffColumns: ColumnDef<StaffTableItems>[] = [
       <RowActions
         row={row}
         setDataAction={table.options.meta?.setDataAction ?? (() => {})}
+        currentUser={table.options.meta?.curentUser}
       />
     ),
     size: 60,
