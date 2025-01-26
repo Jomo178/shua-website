@@ -95,8 +95,8 @@ enum AuthorizationType {
 enum StaffRole {
   developer
   owner
-  headCreator
-  cardCreator
+  admin
+  shuaStaff
 }
 
 model Issues {

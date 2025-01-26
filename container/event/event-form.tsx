@@ -87,7 +87,7 @@ export function EventForm({
                         align="center"
                         initialDateFrom={form.getValues("start")}
                         initialDateTo={form.getValues("end")}
-                        disabledRange={{ before: new Date() }}
+                        // disabledRange={{ before: new Date() }}
                         onUpdate={(value) => {
                           form.setValue(
                             "start",
