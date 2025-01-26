@@ -57,6 +57,10 @@ export default function EditItemsDialog<T extends ItemsNameType>({
     imageLink: "image" in item ? item.image : "",
     changedImage: false,
     errors: [],
+    rarity: {
+      level: item.rarity.level,
+      icon: rarities.find((r) => r.icon === item.rarity.icon)?.name || "",
+    },
   };
 
   const [itemData, setItemData] = useState<

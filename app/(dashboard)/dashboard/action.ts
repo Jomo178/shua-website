@@ -116,3 +116,23 @@ export async function checkForDuplicatedIssueCodes(
 
   return allDuplicatedCodes;
 }
+
+export async function fixItems() {
+  const items = await prisma.pendingIssues.findMany({});
+
+  items.forEach(async (item: any) => {
+    const isDefault = item.rarity?.icon === "default";
+
+    if (isDefault) {
+      await prisma.pendingIssues.update({
+        where: { id: item.id },
+        data: {
+          rarity: {
+            level: item.rarity.level,
+            icon: "<:SB_moon:1285314919964741653>",
+          },
+        },
+      });
+    }
+  });
+}

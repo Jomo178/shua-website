@@ -254,9 +254,7 @@ export default function AddForm({
 
                               form.setValue("rarity", {
                                 level: Number(level),
-                                icon:
-                                  raritiesState.find((r) => r.name === icon)
-                                    ?.icon ?? "",
+                                icon: icon ?? "",
                               });
 
                               onFormChangeAction(form.getValues(), index);

@@ -169,7 +169,15 @@ export default function AddItemsPreview({
     setIsUploading(true);
 
     const uploadPromises = itmesFormPropsValue.map((item, index) =>
-      addIssues(item)
+      addIssues({
+        ...item,
+        rarity: {
+          level: item.rarity.level,
+          icon:
+            rarities.find((r) => r.name === item.rarity.icon)?.icon ??
+            "default",
+        },
+      })
         .then(({ message, variant }) => {
           setUploadingProgress(
             ((index + 1) / itmesFormPropsValue.length) * 100
@@ -187,10 +195,8 @@ export default function AddItemsPreview({
         })
     );
 
-    console.time("uploading");
     const responses = await Promise.all(uploadPromises);
     setUploadingResponse(responses);
-    console.timeEnd("uploading");
 
     const failedItems = itmesFormPropsValue.filter(
       (_, index) => responses[index].variant === "error"
