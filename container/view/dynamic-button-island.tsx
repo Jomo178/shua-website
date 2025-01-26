@@ -56,7 +56,7 @@ export default function DynamicButtonIsland<T extends ItemsNameType>({
   return (
     <div
       className={cn(
-        "fixed bottom-7 left-[50%] z-50 flex h-10 w-10 items-center justify-center rounded-2xl bg-black p-3 font-mono text-xs text-white transition-all duration-300",
+        "fixed bottom-7 left-[50%] z-50 flex h-10 w-10 items-center justify-center rounded-2xl bg-primary p-3 font-mono text-xs transition-all duration-300",
         openIsland ? "h-14 w-fit -translate-x-1/2" : "w-10"
       )}
     >
@@ -78,7 +78,7 @@ export default function DynamicButtonIsland<T extends ItemsNameType>({
             >
               <Icons.cancel strokeWidth={2} size={24} />
             </TooltipTrigger>
-            <TooltipContent className="bg-foreground">
+            <TooltipContent className="bg-background">
               <p>Close Island</p>
             </TooltipContent>
           </Tooltip>
@@ -97,7 +97,7 @@ export default function DynamicButtonIsland<T extends ItemsNameType>({
             >
               <Icons.deselect strokeWidth={2} size={24} />
             </TooltipTrigger>
-            <TooltipContent className="bg-foreground">
+            <TooltipContent className="bg-background">
               <p>Deselect {AllOrSelected}</p>
             </TooltipContent>
           </Tooltip>
@@ -115,7 +115,7 @@ export default function DynamicButtonIsland<T extends ItemsNameType>({
             >
               <Icons.select size={20} />
             </TooltipTrigger>
-            <TooltipContent className="bg-foreground">
+            <TooltipContent className="bg-background">
               <p>Select All</p>
             </TooltipContent>
           </Tooltip>
@@ -128,7 +128,7 @@ export default function DynamicButtonIsland<T extends ItemsNameType>({
             >
               <Icons.info size={20} />
             </TooltipTrigger>
-            <TooltipContent className="bg-foreground">
+            <TooltipContent className="bg-background">
               <p>Show Information</p>
             </TooltipContent>
           </Tooltip>
@@ -152,7 +152,7 @@ export default function DynamicButtonIsland<T extends ItemsNameType>({
                 >
                   <Icons.approve size={20} />
                 </TooltipTrigger>
-                <TooltipContent className="bg-foreground">
+                <TooltipContent className="bg-background">
                   <p>Approve {AllOrSelected}</p>
                 </TooltipContent>
               </Tooltip>
@@ -169,7 +169,7 @@ export default function DynamicButtonIsland<T extends ItemsNameType>({
                 >
                   <Icons.rejected size={20} />
                 </TooltipTrigger>
-                <TooltipContent className="bg-foreground">
+                <TooltipContent className="bg-background">
                   <p>Reject {AllOrSelected}</p>
                 </TooltipContent>
               </Tooltip>
@@ -194,7 +194,7 @@ export default function DynamicButtonIsland<T extends ItemsNameType>({
                 >
                   <Icons.filter size={20} />
                 </TooltipTrigger>
-                <TooltipContent className="bg-foreground">
+                <TooltipContent className="bg-background">
                   <p>Resubmit {AllOrSelected}</p>
                 </TooltipContent>
               </Tooltip>
@@ -212,7 +212,7 @@ export default function DynamicButtonIsland<T extends ItemsNameType>({
             >
               <Icons.deleteButton size={20} />
             </TooltipTrigger>
-            <TooltipContent className="bg-foreground">
+            <TooltipContent className="bg-background">
               <p>Delete {AllOrSelected}</p>
             </TooltipContent>
           </Tooltip>

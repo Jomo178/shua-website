@@ -27,7 +27,7 @@ export function EventAdd({ currentUser, setEventStateAction }: EventAddProps) {
       name: "",
       start: new Date().toISOString(),
       end: new Date().toISOString(),
-      itemsReleaseType: "issues",
+      itemsReleaseType: ["issues"],
       createdById: currentUser.id,
     },
   });

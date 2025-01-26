@@ -17,6 +17,7 @@ type RelationMapping = {
 };
 
 export type ItemStatusViewType<T extends ItemsNameType> =
+  | `missing-${T}`
   | `released-${T}`
   | `pending-${T}`
   | `rejected-${T}`

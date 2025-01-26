@@ -27,7 +27,7 @@ export function RowActions({
   currentUser,
 }: {
   row: Row<StaffTableItems>;
-  setDataAction: Dispatch<SetStateAction<StaffTableItems[]>>;
+  setDataAction: (data: StaffTableItems) => void;
   currentUser: Staff | undefined;
 }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -67,19 +67,12 @@ export function RowActions({
                   {
                     loading: `${row.original.isInTeam ? "Archive" : "Unarchive"} staff...`,
                     success({ message }) {
-                      setDataAction((prevData) =>
-                        prevData.map((staff) => {
-                          if (staff.discordId === row.original.discordId) {
-                            return {
-                              ...staff,
-                              isInTeam: !staff.isInTeam,
-                              status: staff.isInTeam ? "Inactive" : "Active",
-                              updatedAt: new Date(),
-                            };
-                          }
-                          return staff;
-                        })
-                      );
+                      setDataAction({
+                        ...row.original,
+                        isInTeam: !row.original.isInTeam,
+                        status: row.original.isInTeam ? "Inactive" : "Active",
+                        updatedAt: new Date(),
+                      });
                       return message;
                     },
                     error: "Failed to archive staff.",

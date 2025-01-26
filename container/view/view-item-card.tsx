@@ -130,7 +130,9 @@ export default function ViewItemCard<T extends ItemsNameType>({
           <ContextMenuSeparator />
           <ContextMenuItem
             onClick={() => setOpenEditDialog(true)}
-            disabled={hasPermission(currentUser, `edit:${itemNameType}`)}
+            disabled={
+              true || hasPermission(currentUser, `edit:${itemNameType}`)
+            }
           >
             Edit
             <ContextMenuShortcut>
@@ -139,7 +141,9 @@ export default function ViewItemCard<T extends ItemsNameType>({
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => setOpenDeleteDialog(true)}
-            disabled={hasPermission(currentUser, `delete:${itemNameType}`)}
+            disabled={
+              true || hasPermission(currentUser, `delete:${itemNameType}`)
+            }
           >
             Delete
             <ContextMenuShortcut>

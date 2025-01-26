@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { notFound, usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
@@ -54,15 +55,15 @@ export default function ViewSidebar({}: ViewSidebarProps) {
             <SidebarToggle hiddenOnMobile={true} />
 
             <SidebarMenuButton className="h-10">
-              <Icons.icon />
+              <Image src="/images/logo.png" width={40} height={40} alt="logo" />
               <Breadcrumb>
                 <BreadcrumbList className="!flex-nowrap">
-                  <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbItem>
                     <BreadcrumbLink href="/dashboard/view">
                       {toUpperCase(currentPath.split("/", 3).pop() ?? "")}
                     </BreadcrumbLink>
                   </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
+                  <BreadcrumbSeparator />
                   <BreadcrumbItem>
                     <BreadcrumbPage>
                       {toUpperCase(
@@ -133,6 +134,7 @@ export default function ViewSidebar({}: ViewSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
+              tooltip="Sign out"
               onClick={() => signOut()}
               variant="outline"
               className={cn("h-10", open ? "justify-center" : "justify-normal")}

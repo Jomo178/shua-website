@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath, revalidateTag } from "next/cache";
 import { addFormSchema, AddFormSchemaType } from "@/container/add/add";
 
 import { prisma } from "@/lib/database";
@@ -34,6 +35,11 @@ export async function addIssues(
       droppable: true,
     },
   });
+
+  revalidatePath("/events");
+  revalidateTag("events");
+  revalidatePath("/current-event");
+  revalidateTag("current-event");
 
   return { message: "successfully added!", variant: "success" };
 }

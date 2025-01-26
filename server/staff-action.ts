@@ -91,6 +91,7 @@ export async function editStaff(formData: StaffFormSchemaType) {
 
   revalidatePath("/staff");
   revalidateTag("staff");
+  revalidatePath("/events");
 
   return { message: "Staff edited successfully!", staff: staffDiscordInfo[0] };
 }

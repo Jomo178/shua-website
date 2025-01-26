@@ -115,7 +115,19 @@ export default function StaffTable({
       columnVisibility,
     },
     meta: {
-      setDataAction: setData,
+      setDataAction(data: StaffTableItems) {
+        setData((prev: any) => {
+          return prev.map((item: any, index: any) => {
+            if (item.discordId == data.discordId) {
+              return {
+                ...item,
+                ...data,
+              };
+            }
+            return item;
+          });
+        });
+      },
       curentUser: currentUser,
     },
   });
@@ -162,7 +174,7 @@ export default function StaffTable({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-[450px] space-y-4 md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl">
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">

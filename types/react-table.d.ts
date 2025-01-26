@@ -4,7 +4,7 @@ import { Staff } from "@prisma/client";
 
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
-    setDataAction: Dispatch<SetStateAction<StaffTableItems[]>>;
+    setDataAction: (data: StaffTableItems) => void;
     curentUser: Staff;
   }
 }

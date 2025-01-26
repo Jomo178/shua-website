@@ -8,23 +8,38 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Staff } from "@prisma/client";
+import { releaseEvent } from "@/server/events-action";
+import { ItemsType, Staff } from "@prisma/client";
 import { AnimatePresence, motion, useSpring } from "framer-motion";
 import {
   CheckCircle2,
+  CircleAlert,
   Clock,
   Menu,
   MessageSquare,
   StepForwardIcon as Progress,
   Users,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { EventsWithRelation } from "@/types/prisma-relations";
 import {
   formatDistanceToNow,
   formatTimestamp,
   hasPermission,
+  toUpperCase,
 } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -261,10 +276,84 @@ export default function EventCard({
                     </div>
 
                     <div className="space-y-2">
-                      <Button className="w-full">
-                        <MessageSquare className="mr-2 h-4 w-4" />
-                        Release Event
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger
+                          asChild
+                          disabled={hasPermission(currentUser, "handle:event")}
+                        >
+                          <Button
+                            className="w-full"
+                            onClick={() => {
+                              toggleExpand();
+                            }}
+                          >
+                            <MessageSquare
+                              className="-ms-1 me-2 opacity-60"
+                              size={16}
+                              strokeWidth={2}
+                              aria-hidden="true"
+                            />
+                            Release Event
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent onClick={() => toggleExpand()}>
+                          <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">
+                            <div
+                              className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border"
+                              aria-hidden="true"
+                            >
+                              <CircleAlert
+                                className="opacity-80"
+                                size={16}
+                                strokeWidth={2}
+                              />
+                            </div>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Are you absolutely sure?
+                              </AlertDialogTitle>
+                            </AlertDialogHeader>
+                          </div>
+                          <div className="flex flex-col space-y-2">
+                            <span className="text-sm">
+                              This action cannot be undone. This will release
+                              the event and all its issues.
+                            </span>
+                            {event.itemsReleaseType.map((type, index) => {
+                              const pendingName = ("pending" +
+                                toUpperCase(type)) as ItemsType;
+
+                              return (
+                                <span
+                                  key={index}
+                                  className="text-xs text-muted-foreground"
+                                >
+                                  {`Approved ${toUpperCase(type)}: ${event[type].length + event[pendingName].length}`}
+                                  {index < event.itemsReleaseType.length - 1 &&
+                                    ", "}
+                                </span>
+                              );
+                            })}
+                          </div>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                toast.promise(releaseEvent(event.id), {
+                                  loading: "Loading...",
+                                  success: (response) => {
+                                    return response.message;
+                                  },
+                                  error:
+                                    "Something went wrong. Please try again.",
+                                });
+                              }}
+                            >
+                              Release
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </motion.div>
                 )}

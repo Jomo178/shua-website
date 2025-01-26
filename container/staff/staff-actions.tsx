@@ -72,7 +72,7 @@ export function StaffAdd({
 
 interface StaffEditProps {
   staffInformation: StaffTableItems;
-  setDataAction: Dispatch<SetStateAction<StaffTableItems[]>>;
+  setDataAction: (data: StaffTableItems) => void;
   isOpen: boolean;
   setIsOpenAction: Dispatch<SetStateAction<boolean>>;
 }
@@ -102,25 +102,7 @@ export function StaffEdit({
       loading: "Editing staff...",
       success({ message, staff }) {
         form.reset();
-        setDataAction((prevData) =>
-          prevData.map((staff) => {
-            if (staff.discordId === values.discordId) {
-              return {
-                ...values,
-                id: staff.id,
-                image: staff.image,
-                name: staff.name,
-                global_name: staff.global_name,
-                email: staff.email,
-                isInTeam: staff.isInTeam,
-                status: staff.status,
-                createdAt: staff.createdAt,
-                updatedAt: new Date(),
-              };
-            }
-            return staff;
-          })
-        );
+        setDataAction(values as any);
         return message;
       },
       error: "Failed to edit staff.",

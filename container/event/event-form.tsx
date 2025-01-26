@@ -114,7 +114,7 @@ export function EventForm({
                     <FormLabel>Items Release</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      defaultValue={field.value[0]}
                       //TODO: Fix this
                       disabled={true}
                     >

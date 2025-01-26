@@ -1,5 +1,7 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
+
 import {
   IssuesWithRelation,
   PendingIssuesWithRelation,
@@ -141,6 +143,58 @@ export async function getReleasedItems<T extends ItemsNameType>(
     take: amount,
     where: {
       ...filter,
+      approvedBy: {
+        id: {
+          not: undefined,
+        },
+      },
+      createdBy: {
+        id: {
+          not: undefined,
+        },
+      },
+      approvedAt: {
+        not: undefined,
+      },
+      eventId: {
+        not: undefined,
+      },
+    },
+    orderBy,
+    include: {
+      createdBy: true,
+      approvedBy: true,
+      event: true,
+      rejections: {
+        include: {
+          rejectedBy: true,
+          resubmittedBy: true,
+        },
+      },
+    },
+  };
+
+  return (await ReleasedItemsSwitch(
+    whereObj,
+    itemType
+  )) as ReleasedItemReturnType<T>;
+}
+
+export async function getMissingInfoItems<T extends ItemsNameType>(
+  itemType: T,
+  skip: number,
+  amount: number,
+  filter: any,
+  orderBy: any
+): Promise<ReleasedItemReturnType<T>> {
+  const whereObj = {
+    skip,
+    take: amount,
+    where: {
+      approvedById: undefined,
+      createdById: undefined,
+      approvedAt: undefined,
+      eventId: undefined,
     },
     orderBy,
     include: {

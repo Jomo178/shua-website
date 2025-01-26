@@ -26,7 +26,7 @@ export const getAllEvents = unstable_cache(
 export const getCurrentEvent = unstable_cache(
   async (items: ItemsType[]): Promise<EventsWithRelation | null> => {
     const event = await prisma.events.findFirst({
-      where: { itemsReleaseType: { in: items } },
+      where: { itemsReleaseType: { hasSome: items } },
       include: {
         createdBy: true,
         issues: true,
@@ -117,4 +117,60 @@ export async function editEvent(
   revalidateTag("current-event");
 
   return { message: "Event updated successfully!", event };
+}
+
+export async function releaseEvent(eventId: string) {
+  return await prisma.$transaction(async (tx) => {
+    const approvedPendingIssues = await tx.pendingIssues.findMany({
+      where: {
+        eventId,
+        approvedById: {
+          not: null,
+        },
+        approvedAt: {
+          not: null,
+        },
+      },
+      include: {
+        event: true,
+      },
+    });
+
+    if (approvedPendingIssues.length === 0) {
+      return { message: "No approved pending issues found." };
+    }
+
+    const issuesData = approvedPendingIssues.map((pendingIssue) => ({
+      name: pendingIssue.name,
+      group: pendingIssue.group,
+      era: pendingIssue.era,
+      //TODO: Fix this
+      rarity: pendingIssue.rarity as any,
+      code: pendingIssue.code,
+      image: pendingIssue.image,
+      createdAt: pendingIssue.createdAt,
+      updatedAt: pendingIssue.updatedAt,
+      eventId: pendingIssue.eventId,
+      createdById: pendingIssue.createdById,
+      approvedById: pendingIssue.approvedById!,
+      approvedAt: pendingIssue.approvedAt!,
+      droppable: pendingIssue.droppable,
+    }));
+
+    await tx.issues.createMany({
+      data: issuesData,
+    });
+
+    await tx.pendingIssues.deleteMany({
+      where: {
+        id: {
+          in: approvedPendingIssues.map((pendingIssue) => pendingIssue.id),
+        },
+      },
+    });
+
+    return {
+      message: "Approved pending issues successfully transferred to issues.",
+    };
+  });
 }
