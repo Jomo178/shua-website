@@ -180,33 +180,6 @@ export async function getReleasedItems<T extends ItemsNameType>(
   )) as ReleasedItemReturnType<T>;
 }
 
-export async function getMissingInfoItems<T extends ItemsNameType>(
-  itemType: T,
-  skip: number,
-  amount: number,
-  filter: any,
-  orderBy: any
-): Promise<ReleasedItemReturnType<T>> {
-  return (await prisma.issues.findMany({
-    skip,
-    take: amount,
-    where: {
-      approvedBy: null,
-    },
-    include: {
-      createdBy: true,
-      approvedBy: true,
-      event: true,
-      rejections: {
-        include: {
-          rejectedBy: true,
-          resubmittedBy: true,
-        },
-      },
-    },
-  })) as ReleasedItemReturnType<T>;
-}
-
 async function ReleasedItemsSwitch(whereObj: any, itemType: ItemsNameType) {
   switch (itemType) {
     case "issues":

@@ -100,25 +100,25 @@ enum StaffRole {
 }
 
 model Issues {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   era          String
   group        String
   rarity       Json
-  code         String    @unique
+  code         String   @unique
   image        String
   droppable    Boolean
   createdAt    DateTime
-  updatedAt    DateTime  @updatedAt
-  eventId      String?   @db.ObjectId
-  createdById  String?   @db.ObjectId
-  approvedById String?   @db.ObjectId
-  approvedAt   DateTime?
+  updatedAt    DateTime @updatedAt
+  eventId      String   @db.ObjectId
+  createdById  String   @db.ObjectId
+  approvedById String   @db.ObjectId
+  approvedAt   DateTime
 
   rejections Rejections[] @relation("RejectionsIssue")
-  createdBy  Staff?       @relation(fields: [createdById], references: [id], name: "IssuesCreatedBy")
-  approvedBy Staff?       @relation(fields: [approvedById], references: [id], name: "IssuesApprovedBy")
-  event      Events?      @relation(fields: [eventId], references: [id], name: "IssuesEvent")
+  createdBy  Staff        @relation(fields: [createdById], references: [id], name: "IssuesCreatedBy")
+  approvedBy Staff        @relation(fields: [approvedById], references: [id], name: "IssuesApprovedBy")
+  event      Events       @relation(fields: [eventId], references: [id], name: "IssuesEvent")
 
   @@map("issues")
 }

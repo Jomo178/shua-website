@@ -86,8 +86,8 @@ export default function EventCard({
 
   let progress = 0;
 
-  let contributors: any = [...event.issues, ...event.pendingIssues].map(
-    (issue) => {
+  let contributors: any = [...event.issues, ...event.pendingIssues]
+    .map((issue) => {
       let contributor = allStaffInformation.find(
         (staff) => staff.id === issue.createdById
       );
@@ -97,8 +97,12 @@ export default function EventCard({
           image: contributor.image,
         };
       }
-    }
-  );
+    })
+    .filter(
+      (contributor, index, self) =>
+        contributor &&
+        index === self.findIndex((c) => c?.name === contributor.name)
+    );
 
   let changes = [...event.issues, ...event.pendingIssues]
     .flatMap((issue) => {

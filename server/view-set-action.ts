@@ -222,28 +222,3 @@ export async function editItems<T extends ItemsNameType>({
     editedItem: edited as ItemType<T>[0] | ItemType<T>[1],
   };
 }
-
-export async function updateMissingInformation(
-  items: z.infer<typeof formSchema>
-) {
-  const currentUser = await getCurrentUser(true);
-
-  const updatedItems = await prisma.issues.updateMany({
-    where: {
-      id: {
-        in: items.issuesIds,
-      },
-    },
-    data: {
-      createdById: items.createdById,
-      approvedById: items.approvedById,
-      eventId: items.eventId,
-      approvedAt: new Date(),
-    },
-  });
-
-  return {
-    message: `Items updated successfully.`,
-    updatedItems,
-  };
-}

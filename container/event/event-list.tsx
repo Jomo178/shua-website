@@ -26,9 +26,10 @@ function EventsList({
     (event) =>
       new Date(event.start) <= currentDate && new Date(event.end) >= currentDate
   );
-  const pastEvents = eventState.filter(
-    (event) => new Date(event.end) < currentDate
-  );
+  const pastEvents = eventState
+    .filter((event) => new Date(event.end) < currentDate)
+    .sort((a, b) => new Date(b.end).getTime() - new Date(a.end).getTime());
+
   const upcomingEvents = eventState.filter(
     (event) => new Date(event.start) > currentDate
   );

@@ -78,11 +78,11 @@ export default function ViewItemCard<T extends ItemsNameType>({
     (rejection) => !rejection.resubmitted
   );
 
-  const disableButton = true;
-  // (item.createdBy && currentUser.id == item.createdBy.id) ||
-  // item.approvedBy !== null ||
-  // pendingRejections ||
-  // hasPermission(currentUser, `handle:${itemNameType}`);
+  const disableButton =
+    (item.createdBy && currentUser.id == item.createdBy.id) ||
+    item.approvedBy !== null ||
+    pendingRejections ||
+    hasPermission(currentUser, `handle:${itemNameType}`);
 
   return (
     <div
@@ -130,9 +130,7 @@ export default function ViewItemCard<T extends ItemsNameType>({
           <ContextMenuSeparator />
           <ContextMenuItem
             onClick={() => setOpenEditDialog(true)}
-            disabled={
-              true || hasPermission(currentUser, `edit:${itemNameType}`)
-            }
+            disabled={hasPermission(currentUser, `edit:${itemNameType}`)}
           >
             Edit
             <ContextMenuShortcut>
@@ -141,9 +139,7 @@ export default function ViewItemCard<T extends ItemsNameType>({
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => setOpenDeleteDialog(true)}
-            disabled={
-              true || hasPermission(currentUser, `delete:${itemNameType}`)
-            }
+            disabled={hasPermission(currentUser, `delete:${itemNameType}`)}
           >
             Delete
             <ContextMenuShortcut>

@@ -1,11 +1,9 @@
 import {
-  getMissingInfoItems,
   getPendingItems,
   getRejectedItems,
   getReleasedItems,
   getUpcomingItems,
 } from "@/server/view-get-action";
-import { X } from "lucide-react";
 import { z } from "zod";
 
 import { ItemListingView, ItemsNameType } from "@/types/view";
@@ -15,20 +13,6 @@ export function generateItemsViewPort<T extends ItemsNameType>(
   type: T
 ): ItemListingView<T>[] {
   const template: ItemListingView<T>[] = [
-    {
-      title: `Missing ${type.charAt(0).toUpperCase() + type.slice(1)}`,
-      id: `missing-${type}`,
-      description: `Missing information for ${type.charAt(0).toUpperCase() + type.slice(1)}.`,
-      noteDescription: `Please add the missing information for the ${type}.`,
-      fetchCount: 0,
-      fetchFunction: (skip, amount, filter, orderBy) =>
-        getMissingInfoItems(type, skip, amount, filter, orderBy),
-      data: [],
-      selectedItems: [],
-      disabled: false,
-      href: `/dashboard/view/missing-${type}`,
-      Icon: X,
-    },
     {
       title: `Rejected ${type.charAt(0).toUpperCase() + type.slice(1)}`,
       id: `rejected-${type}`,
