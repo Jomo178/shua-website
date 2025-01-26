@@ -25,11 +25,13 @@ export default async function Page({
   params: Promise<{ item: ItemsType; rarities: Rarity[] }>;
 }) {
   const { item, rarities = [] } = await params;
-  const issueEvent = await getCurrentEvent(["issues"]);
+  const issueEvent = await getCurrentEvent([
+    item?.length > 0 ? item : "issues",
+  ]);
   //TODO: Add a check for the issueEvent
   if (!issueEvent) return notFound();
   const getCurrentStaff = await getCurrentUser(true);
-  if (!getCurrentStaff) return notFound();
+  if (!getCurrentStaff?.staff) return notFound();
   if (!rarities || rarities?.length === 0)
     rarities.push(...(await getAllRarities()));
 

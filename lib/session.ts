@@ -27,7 +27,7 @@ export async function getCurrentUser<T extends boolean>(
   }
 
   const findStaff = await prisma.staff.findUnique({
-    where: { discordId: session?.user?.id },
+    where: { discordId: session?.user?.id ?? "" },
   });
 
   if (!findStaff) {

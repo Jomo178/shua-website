@@ -1,9 +1,15 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { DashboradActionsType } from "@/types";
 
 import { viewDashboard } from "@/config/sidebar";
+import { getCurrentUser } from "@/lib/session";
 
-export default function Page() {
+export default async function Page() {
+  const getStaff = await getCurrentUser(true);
+
+  if (!getStaff.staff) return notFound();
+
   return (
     <section
       id="features"
