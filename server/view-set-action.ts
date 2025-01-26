@@ -1,6 +1,8 @@
 "use server";
 
+import { formSchema } from "@/container/view/info-form";
 import { Prisma } from "@prisma/client";
+import { z } from "zod";
 
 import {
   EditItemsProps,
@@ -218,5 +220,30 @@ export async function editItems<T extends ItemsNameType>({
   return {
     message: `${items} edited successfully.`,
     editedItem: edited as ItemType<T>[0] | ItemType<T>[1],
+  };
+}
+
+export async function updateMissingInformation(
+  items: z.infer<typeof formSchema>
+) {
+  const currentUser = await getCurrentUser(true);
+
+  const updatedItems = await prisma.issues.updateMany({
+    where: {
+      id: {
+        in: items.issuesIds,
+      },
+    },
+    data: {
+      createdById: items.createdById,
+      approvedById: items.approvedById,
+      eventId: items.eventId,
+      approvedAt: new Date(),
+    },
+  });
+
+  return {
+    message: `Items updated successfully.`,
+    updatedItems,
   };
 }

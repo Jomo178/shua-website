@@ -14,9 +14,20 @@ import {
 } from "@/types/view";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import {
+  Credenza,
+  CredenzaBody,
+  CredenzaContent,
+  CredenzaDescription,
+  CredenzaFooter,
+  CredenzaHeader,
+  CredenzaTitle,
+  CredenzaTrigger,
+} from "@/components/ui/credenza";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Icons } from "@/components/ui/icons";
 import { useMultiSidebar } from "@/components/ui/multisidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { getStaffIds } from "@/app/(dashboard)/dashboard/action";
 
@@ -26,6 +37,7 @@ import {
   constructWhereConditions,
   searchParams,
 } from "./handlers";
+import InfoForm from "./info-form";
 import ItemsFilterMenu from "./items-filter-menu";
 import ItemsInformationSidebar from "./items-information-sidebar";
 import { generateItemsViewPort } from "./view";
@@ -115,13 +127,38 @@ export default function ViewAllItems<T extends ItemsNameType>({
   return (
     <div className="container !px-0 lg:!px-8">
       <div className="flex items-center justify-between">
-        <div className="space-y-1">
+        <div className="flex flex-col space-y-1">
           <h2 className="text-2xl font-semibold tracking-tight">
             {viewPort.title}
           </h2>
           <Balancer className="text-sm text-muted-foreground">
             {viewPort.description}
           </Balancer>
+          {viewPort.selectedItems.length > 0 &&
+            viewPort.title.includes("Missing") && (
+              <Credenza>
+                <CredenzaTrigger asChild>
+                  <Button>Add Missing Information</Button>
+                </CredenzaTrigger>
+                <CredenzaContent className="sm:max-w-[600px]">
+                  <CredenzaHeader>
+                    <CredenzaTitle>Add Missing Information</CredenzaTitle>
+                    <CredenzaDescription>
+                      Add the missing information for the selected items.
+                    </CredenzaDescription>
+                  </CredenzaHeader>
+
+                  <CredenzaBody className="col-span-3 grid h-full content-start space-y-4">
+                    <ScrollArea className="max-h-80 w-full md:!max-h-full">
+                      <InfoForm
+                        selectedIssues={viewPort.selectedItems}
+                        setViewTypeDataAction={setViewPort as any}
+                      />
+                    </ScrollArea>
+                  </CredenzaBody>
+                </CredenzaContent>
+              </Credenza>
+            )}
         </div>
         <Button
           variant="outline"

@@ -49,10 +49,7 @@ export function getPermissionsTree(staff: Partial<Staff> = {}): TreeNode[] {
 }
 
 export const staffFormSchema = z.object({
-  discordId: z
-    .string()
-    .min(1, { message: "Discord ID is required!" })
-    .max(18, { message: "Discord ID is too long!" }),
+  discordId: z.string().min(1, { message: "Discord ID is required!" }),
   role: z.nativeEnum(StaffRole, { message: "Role is required!" }),
   create: z.array(z.nativeEnum(AuthorizationType)).optional().default([]),
   edit: z.array(z.nativeEnum(AuthorizationType)).optional().default([]),

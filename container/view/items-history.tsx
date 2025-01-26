@@ -22,9 +22,9 @@ export default function ItemsHistory<T extends ItemsNameType>({
   const getDataByDiscordId = (id: string) => {
     const defaultData = { username: "IU", avatar: "/images/shua.png" };
     if (!AllStaffInformation) return defaultData;
-    const info = AllStaffInformation.find((staff) => staff?.id === id);
+    const info = AllStaffInformation.find((staff) => staff?.discordId === id);
     if (!info) return defaultData;
-    return info;
+    return { username: info.global_name, avatar: info.image };
   };
 
   const historyProcess = [
