@@ -8,7 +8,7 @@ import { getCurrentUser } from "@/lib/session";
 export default async function Page() {
   const getStaff = await getCurrentUser(true);
 
-  if (!getStaff.staff) return notFound();
+  if (!getStaff?.staff) return notFound();
 
   return (
     <section
