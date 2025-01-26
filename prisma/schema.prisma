@@ -94,6 +94,8 @@ enum AuthorizationType {
 
 enum StaffRole {
   developer
+  owner
+  headCreator
   cardCreator
 }
 
