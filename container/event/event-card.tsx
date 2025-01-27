@@ -8,10 +8,11 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { releaseEvent } from "@/server/events-action";
+import { endEvent, releaseEvent } from "@/server/events-action";
 import { ItemsType, Staff } from "@prisma/client";
 import { AnimatePresence, motion, useSpring } from "framer-motion";
 import {
+  CalendarOff,
   CheckCircle2,
   CircleAlert,
   Clock,
@@ -77,6 +78,7 @@ export default function EventCard({
   const { isExpanded, toggleExpand, animatedHeight } = useExpandable();
   const contentRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isEndOpen, setIsEndOpen] = useState(false);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -162,25 +164,100 @@ export default function EventCard({
             </Badge>
             <h3 className="text-2xl font-semibold">{event.name}</h3>
           </div>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="icon"
-                variant="outline"
-                className="h-8 w-8"
-                disabled={hasPermission(currentUser, "edit:event")}
-                onClick={() => {
-                  toggleExpand();
-                  setIsOpen(true);
-                }}
-              >
-                <Menu className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Edit</p>
-            </TooltipContent>
-          </Tooltip>
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-8 w-8"
+                  disabled={hasPermission(currentUser, "edit:event")}
+                  onClick={() => {
+                    toggleExpand();
+                    setIsOpen(true);
+                  }}
+                >
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-8 w-8"
+                  disabled={hasPermission(currentUser, "handle:event")}
+                  onClick={() => {
+                    toggleExpand();
+                    setIsEndOpen(true);
+                  }}
+                >
+                  <CalendarOff className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>End Event</p>
+              </TooltipContent>
+            </Tooltip>
+            <AlertDialog open={isEndOpen} onOpenChange={setIsEndOpen}>
+              <AlertDialogContent onClick={() => toggleExpand()}>
+                <div className="flex flex-col gap-2 max-sm:items-center sm:flex-row sm:gap-4">
+                  <div
+                    className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border"
+                    aria-hidden="true"
+                  >
+                    <CircleAlert
+                      className="opacity-80"
+                      size={16}
+                      strokeWidth={2}
+                    />
+                  </div>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                  </AlertDialogHeader>
+                </div>
+                <div className="flex flex-col space-y-2">
+                  <span className="text-sm">
+                    This action cannot be undone. This will end the event and
+                    all the issues will not be drop able anymore!
+                  </span>
+                  {event.itemsReleaseType.map((type, index) => {
+                    return (
+                      <span
+                        key={index}
+                        className="text-xs text-muted-foreground"
+                      >
+                        {`${toUpperCase(type)}: ${event[type].length}`}
+                        {index < event.itemsReleaseType.length - 1 && ", "}
+                      </span>
+                    );
+                  })}
+                </div>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      toast.promise(endEvent(event.id), {
+                        loading: "Loading...",
+                        success: (response) => {
+                          return response.message;
+                        },
+                        error: "Something went wrong. Please try again.",
+                      });
+                    }}
+                  >
+                    End Event
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -283,7 +360,10 @@ export default function EventCard({
                       <AlertDialog>
                         <AlertDialogTrigger
                           asChild
-                          disabled={hasPermission(currentUser, "handle:event")}
+                          disabled={
+                            event.end < new Date() ||
+                            hasPermission(currentUser, "handle:event")
+                          }
                         >
                           <Button
                             className="w-full"

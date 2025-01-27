@@ -41,7 +41,7 @@ export const getStaffAllInformation = unstable_cache(
     return staffItems;
   },
   ["/staff"],
-  { revalidate: 60 * 60 * 24, tags: ["staff"] }
+  { revalidate: 60 * 60, tags: ["staff"] }
 );
 
 export const getStaffIds = unstable_cache(
@@ -54,7 +54,7 @@ export const getStaffIds = unstable_cache(
     });
   },
   ["/staff"],
-  { revalidate: 60 * 60 * 24, tags: ["staff"] }
+  { revalidate: 60 * 60, tags: ["staff"] }
 );
 
 export const getAllRarities = unstable_cache(
@@ -63,7 +63,7 @@ export const getAllRarities = unstable_cache(
     return rarities;
   },
   ["/rarities"],
-  { revalidate: 60 * 60 * 24, tags: ["rarities"] }
+  { revalidate: 60 * 60, tags: ["rarities"] }
 );
 
 export async function addRarity(formData: RarityFormSchemaType) {

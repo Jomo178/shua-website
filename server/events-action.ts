@@ -174,3 +174,20 @@ export async function releaseEvent(eventId: string) {
     };
   });
 }
+
+export async function endEvent(eventId: string) {
+  return await prisma.$transaction(async (tx) => {
+    const event = await tx.issues.updateMany({
+      where: { id: eventId },
+      data: {
+        droppable: false,
+      },
+    });
+
+    revalidatePath("/events");
+    revalidateTag("events");
+    revalidatePath("/current-event");
+    revalidateTag("current-event");
+    return { message: "Event ended successfully!" };
+  });
+}
