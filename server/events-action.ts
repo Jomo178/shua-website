@@ -19,8 +19,8 @@ export const getAllEvents = unstable_cache(
 
     return events;
   },
-  ["/events"],
-  { revalidate: 60 * 60 * 24, tags: ["events"] }
+  ["/dashboard/events"],
+  { revalidate: 60 * 60 * 24, tags: ["all-events"] }
 );
 
 export const getCurrentEvent = unstable_cache(
@@ -36,7 +36,7 @@ export const getCurrentEvent = unstable_cache(
 
     return event;
   },
-  ["/current-event"],
+  ["/dashboard/events"],
   { revalidate: 60 * 60 * 24, tags: ["current-event"] }
 );
 
@@ -71,9 +71,7 @@ export async function addEvent(
     },
   });
 
-  revalidatePath("/events");
-  revalidateTag("events");
-  revalidatePath("/current-event");
+  revalidateTag("all-events");
   revalidateTag("current-event");
 
   return { message: "Event added successfully!", event };
@@ -111,9 +109,7 @@ export async function editEvent(
     },
   });
 
-  revalidatePath("/events");
-  revalidateTag("events");
-  revalidatePath("/current-event");
+  revalidateTag("all-events");
   revalidateTag("current-event");
 
   return { message: "Event updated successfully!", event };
@@ -184,9 +180,7 @@ export async function endEvent(eventId: string) {
       },
     });
 
-    revalidatePath("/events");
-    revalidateTag("events");
-    revalidatePath("/current-event");
+    revalidateTag("all-events");
     revalidateTag("current-event");
     return { message: "Event ended successfully!" };
   });

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { revalidateTag, unstable_cache } from "next/cache";
 import {
   rarityFormSchema,
   RarityFormSchemaType,
@@ -40,21 +40,8 @@ export const getStaffAllInformation = unstable_cache(
 
     return staffItems;
   },
-  ["/staff"],
-  { revalidate: 60 * 60, tags: ["staff"] }
-);
-
-export const getStaffIds = unstable_cache(
-  async () => {
-    return await prisma.staff.findMany({
-      select: {
-        id: true,
-        discordId: true,
-      },
-    });
-  },
-  ["/staff"],
-  { revalidate: 60 * 60, tags: ["staff"] }
+  ["/dashboard/staff"],
+  { revalidate: 60 * 60 * 5, tags: ["all-staff"] }
 );
 
 export const getAllRarities = unstable_cache(
@@ -62,8 +49,8 @@ export const getAllRarities = unstable_cache(
     const rarities = await prisma.rarity.findMany();
     return rarities;
   },
-  ["/rarities"],
-  { revalidate: 60 * 60, tags: ["rarities"] }
+  ["/dashboard/add/issues"],
+  { revalidate: 60 * 60 * 24, tags: ["all-rarities"] }
 );
 
 export async function addRarity(formData: RarityFormSchemaType) {
@@ -89,8 +76,7 @@ export async function addRarity(formData: RarityFormSchemaType) {
     },
   });
 
-  revalidatePath("/rarities");
-  revalidateTag("rarities");
+  revalidateTag("all-rarities");
 
   return { message: "Rarity added successfully!", rarity };
 }
@@ -115,24 +101,4 @@ export async function checkForDuplicatedIssueCodes(
   ];
 
   return allDuplicatedCodes;
-}
-
-export async function fixItems() {
-  const items = await prisma.pendingIssues.findMany({});
-
-  items.forEach(async (item: any) => {
-    const isDefault = item.rarity?.icon === "default";
-
-    if (isDefault) {
-      await prisma.pendingIssues.update({
-        where: { id: item.id },
-        data: {
-          rarity: {
-            level: item.rarity.level,
-            icon: "<:SB_moon:1285314919964741653>",
-          },
-        },
-      });
-    }
-  });
 }

@@ -17,9 +17,8 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Icons } from "@/components/ui/icons";
 import { useMultiSidebar } from "@/components/ui/multisidebar";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { getStaffIds } from "@/app/(dashboard)/dashboard/action";
+import { getStaffAllInformation } from "@/app/(dashboard)/dashboard/action";
 
 import DynamicButtonIsland from "./dynamic-button-island";
 import {
@@ -77,7 +76,10 @@ export default function ViewAllItems<T extends ItemsNameType>({
     setLoading(true);
     let staffs = null;
     if (staffInfo.length === 0) {
-      staffs = await getStaffIds();
+      staffs = (await getStaffAllInformation()).map((staff) => ({
+        id: staff.id,
+        discordId: staff.discordId,
+      }));
       setStaffInfo(staffs);
     }
 

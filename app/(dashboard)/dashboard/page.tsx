@@ -4,9 +4,6 @@ import { DashboradActionsType } from "@/types";
 
 import { viewDashboard } from "@/config/sidebar";
 import { getCurrentUser } from "@/lib/session";
-import { Button } from "@/components/ui/button";
-
-import Test from "./test";
 
 export default async function Page() {
   const getCurrentStaff = await getCurrentUser(true);
@@ -27,7 +24,6 @@ export default async function Page() {
           Welcome to the Dashboard! Here you can choose from a variety of tools
           and resources to help you get things done better and faster.
         </p>
-        <Test />
       </div>
       <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
         {viewDashboard[1].items.map((card, index) => (
