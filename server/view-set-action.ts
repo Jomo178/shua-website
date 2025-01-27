@@ -107,17 +107,15 @@ export async function deleteItems<T extends ItemsNameType>(
   if (items.length == 0) return { message: "No item selected." };
   const currentUser = await getCurrentUser(true);
 
-  if (password !== "iu-delete-items") {
+  if (password !== "shua-delete-items") {
     throw new Error("Items were not deleted. Incorrect password.");
   }
 
-  if (["issues", "frames"].includes(itemsViewPortId)) {
-    await utapi.deleteFiles(
-      items
-        .map((item) => item.image.split("/").pop())
-        .filter((image): image is string => !!image)
-    );
-  }
+  const test = await utapi.deleteFiles(
+    items
+      .map((item) => item.image.split("/").pop())
+      .filter((image): image is string => !!image)
+  );
 
   const itemsIds = {
     id: {
@@ -132,7 +130,11 @@ export async function deleteItems<T extends ItemsNameType>(
       });
     }
   } else {
-    if (itemsViewPortId === "pending-issues") {
+    if (
+      itemsViewPortId === "pending-issues" ||
+      itemsViewPortId === "rejected-issues" ||
+      itemsViewPortId === "upcoming-issues"
+    ) {
       await prisma.pendingIssues.deleteMany({
         where: itemsIds,
       });
@@ -155,7 +157,7 @@ export async function editItems<T extends ItemsNameType>({
     const deleteImage = await deleteItems(
       itemsViewPortId,
       [{ id: item.id, image: item.imageLink }],
-      "iu-delete-items"
+      "shua-delete-items"
     );
 
     if (!deleteImage.message) return { message: "Item was not Edited" };
