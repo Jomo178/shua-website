@@ -29,7 +29,8 @@ export default async function Page({
   //TODO: Add a check for the issueEvent
   if (!issueEvent) return notFound();
   const getCurrentStaff = await getCurrentUser(true);
-  if (!getCurrentStaff?.staff) return notFound();
+  if (!getCurrentStaff?.staff || !getCurrentStaff.staff.isInTeam)
+    return notFound();
   if (!rarities || rarities?.length === 0)
     rarities.push(...(await getAllRarities()));
 

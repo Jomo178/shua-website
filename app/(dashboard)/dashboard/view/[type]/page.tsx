@@ -32,7 +32,8 @@ export default async function Page({
 }) {
   const type = (await params).type;
   const getCurrentStaff = await getCurrentUser(true);
-  if (!getCurrentStaff?.staff) return notFound();
+  if (!getCurrentStaff?.staff || !getCurrentStaff.staff.isInTeam)
+    return notFound();
   const event = await getCurrentEvent(["issues"]);
   if (!event) return notFound();
   const rarities = await getAllRarities();

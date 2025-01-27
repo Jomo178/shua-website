@@ -6,13 +6,13 @@ import { viewDashboard } from "@/config/sidebar";
 import { getCurrentUser } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 
-import { fixItems } from "./action";
 import Test from "./test";
 
 export default async function Page() {
-  const getStaff = await getCurrentUser(true);
+  const getCurrentStaff = await getCurrentUser(true);
 
-  if (!getStaff?.staff) return notFound();
+  if (!getCurrentStaff?.staff || !getCurrentStaff.staff.isInTeam)
+    return notFound();
 
   return (
     <section
