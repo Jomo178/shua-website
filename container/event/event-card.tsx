@@ -75,6 +75,7 @@ export default function EventCard({
   event,
   allStaffInformation,
 }: EventCardProps) {
+  const currentTime = new Date();
   const { isExpanded, toggleExpand, animatedHeight } = useExpandable();
   const contentRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -86,7 +87,7 @@ export default function EventCard({
     }
   }, [isExpanded, animatedHeight]);
 
-  let progress = 0;
+  let progress = calculateProgress(event);
 
   let contributors: any = [...event.issues, ...event.pendingIssues]
     .map((issue) => {
@@ -115,12 +116,6 @@ export default function EventCard({
           by:
             allStaffInformation.find((staff) => staff.id === issue.createdById)
               ?.name || "Unknown",
-          name: issue.name,
-        },
-        {
-          action: "updated",
-          date: issue.updatedAt,
-          by: "System",
           name: issue.name,
         },
         {
@@ -155,12 +150,14 @@ export default function EventCard({
             <Badge
               variant="secondary"
               className={
-                progress === 100
+                new Date(event.end).getTime() < currentTime.getTime()
                   ? "bg-green-100 text-green-600"
                   : "bg-blue-100 text-blue-600"
               }
             >
-              {progress === 100 ? "Completed" : "In Progress"}
+              {new Date(event.end).getTime() < currentTime.getTime()
+                ? "Completed"
+                : "In Progress"}
             </Badge>
             <h3 className="text-2xl font-semibold">{event.name}</h3>
           </div>
@@ -264,10 +261,10 @@ export default function EventCard({
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-gray-600">
-              <span>Progress</span>
+              <span>Remaining Time</span>
               <span>{progress}%</span>
             </div>
-            <ProgressBar value={progress} className="h-2" />
+            <ProgressBar value={Number(progress)} className="h-2" />
           </div>
 
           <motion.div
@@ -361,7 +358,8 @@ export default function EventCard({
                         <AlertDialogTrigger
                           asChild
                           disabled={
-                            event.end < new Date() ||
+                            new Date(event.end).getTime() <
+                              currentTime.getTime() ||
                             hasPermission(currentUser, "handle:event")
                           }
                         >
@@ -462,10 +460,6 @@ export default function EventCard({
               addSuffix: true,
             })}
           </span>
-          <span>
-            {event.pendingIssues.map((x) => x.approvedAt != null).length}{" "}
-            approved issues
-          </span>
         </div>
       </CardFooter>
     </Card>
@@ -483,4 +477,14 @@ export function useExpandable(initialState = false) {
   }, []);
 
   return { isExpanded, toggleExpand, animatedHeight };
+}
+
+function calculateProgress(event: EventsWithRelation) {
+  const now = new Date();
+  const totalDuration =
+    new Date(event.end).getTime() - new Date(event.start).getTime();
+  const elapsed = now.getTime() - new Date(event.start).getTime();
+
+  const progress = Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100);
+  return progress.toFixed(2);
 }
