@@ -229,23 +229,25 @@ function ItemRejections<T extends ItemsNameType>({
         <div className="grid grid-cols-2 gap-2 pb-10">
           {item.rejections.map((rejection, index) => {
             const staff = AllStaffInformation?.find(
-              (staff) => staff?.id === rejection.rejectedBy.discordId
+              (staff) => staff?.discordId === rejection.rejectedBy.discordId
             );
             return (
               <div key={index} className="col-span-2 flex flex-col">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8">
                     <AvatarImage
-                      src={staff?.avatar ?? "/images/iu.png"}
-                      alt={staff?.username}
+                      src={staff?.image ?? "/images/iu.png"}
+                      alt={staff?.global_name}
                     />
-                    <AvatarFallback>{staff?.username.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>
+                      {staff?.global_name.charAt(0)}
+                    </AvatarFallback>
                   </Avatar>
                   <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
                     {rejection.reason}
                   </code>
                 </div>
-                <span className="pt-2 text-xs text-white">
+                <span className="pt-2 text-xs">
                   {formatTimestamp(rejection.createdAt)}
                 </span>
               </div>

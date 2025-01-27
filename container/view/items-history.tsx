@@ -41,7 +41,7 @@ export default function ItemsHistory<T extends ItemsNameType>({
       historyProcess.push({
         title: "Rejected",
         timestamp: rejection.createdAt,
-        userInfo: getDataByDiscordId(rejection.rejectedBy.discordId),
+        userInfo: getDataByDiscordId(rejection.rejectedBy.discordId ?? "IU"),
         style: "text-red-500",
       });
 
