@@ -178,7 +178,7 @@ export async function releaseEvent(eventId: string) {
 export async function endEvent(eventId: string) {
   return await prisma.$transaction(async (tx) => {
     const event = await tx.issues.updateMany({
-      where: { id: eventId },
+      where: { eventId: eventId },
       data: {
         droppable: false,
       },
