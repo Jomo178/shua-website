@@ -99,6 +99,21 @@ enum StaffRole {
   shuaStaff
 }
 
+model Cards {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  era    String
+  group  String
+  rarity Json
+  code   String   @unique
+  image  String
+  date   DateTime
+  owner  String
+  issue  String   @unique
+
+  @@map("cards")
+}
+
 model Issues {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String

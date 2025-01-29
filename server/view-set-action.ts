@@ -199,6 +199,26 @@ export async function editItems<T extends ItemsNameType>({
   }
 
   if (itemsViewPortId.includes("released")) {
+    const getIssue = await prisma.issues.findUnique({
+      where: {
+        id: item.id,
+      },
+    });
+
+    await prisma.cards.updateMany({
+      where: {
+        code: getIssue!.code,
+      },
+      data: {
+        name: item.name,
+        group: item.group,
+        era: item.era,
+        code: item.code,
+        rarity: item.rarity,
+        image: item.imageLink,
+      },
+    });
+
     edited = await (prisma[items] as any).update({
       where: {
         id: item.id,
@@ -208,6 +228,7 @@ export async function editItems<T extends ItemsNameType>({
     });
   } else {
     const pendingItems = `pending${toUpperCase(items)}` as ItemsPendingType;
+
     edited = await (prisma[pendingItems] as any).update({
       where: {
         id: item.id,
