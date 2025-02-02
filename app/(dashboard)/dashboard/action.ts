@@ -10,39 +10,41 @@ import { StaffTableItems } from "@/container/staff/staff-columns";
 import { prisma } from "@/lib/database";
 import { fetchUserProfilesFromDiscord } from "@/lib/session";
 
-//  unstable_cache(
-export const getStaffAllInformation = async () => {
-  const staffsList = await prisma.staff.findMany();
-  const staffEmailsList = await prisma.user.findMany();
+export const getStaffAllInformation = unstable_cache(
+  async () => {
+    const staffsList = await prisma.staff.findMany();
+    const staffEmailsList = await prisma.user.findMany();
 
-  const staffDiscordProfile = await fetchUserProfilesFromDiscord(
-    staffsList.map((staff) => staff.discordId)
-  );
-
-  const staffItems: StaffTableItems[] = staffsList.map((staff) => {
-    const discordProfile = staffDiscordProfile.find(
-      (profile) => profile.id === staff.discordId
+    const staffDiscordProfile = await fetchUserProfilesFromDiscord(
+      staffsList.map((staff) => staff.discordId)
     );
 
-    const staffEmail = staffEmailsList.find(
-      (email) => email.discordId === staff.discordId
-    );
+    const staffItems: StaffTableItems[] = staffsList.map((staff) => {
+      const discordProfile = staffDiscordProfile.find(
+        (profile) => profile.id === staff.discordId
+      );
 
-    return {
-      ...staff,
-      name: discordProfile?.username ?? "Unknown",
-      image: discordProfile?.avatar ?? null,
-      email: staffEmail?.email ?? "Not provided",
-      global_name: discordProfile?.global_name ?? "Not provided",
-      status: staff.isInTeam ? "Active" : "Inactive",
-    };
-  });
+      console.log("discordProfile", discordProfile);
 
-  return staffItems;
-};
-//   ["/dashboard/staff"],
-//   { revalidate: 60 * 60 * 5, tags: ["all-staff"] }
-// );
+      const staffEmail = staffEmailsList.find(
+        (email) => email.discordId === staff.discordId
+      );
+
+      return {
+        ...staff,
+        name: discordProfile?.username,
+        image: discordProfile?.avatar ?? null,
+        email: staffEmail?.email ?? "Not provided",
+        global_name: discordProfile?.global_name ?? "Not provided",
+        status: staff.isInTeam ? "Active" : "Inactive",
+      };
+    });
+
+    return staffItems;
+  },
+  ["/dashboard/staff"],
+  { revalidate: 60 * 60 * 5, tags: ["all-staff"] }
+);
 
 export const getAllRarities = unstable_cache(
   async () => {

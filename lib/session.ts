@@ -45,7 +45,9 @@ export async function getCurrentUser<T extends boolean>(
 }
 
 export async function fetchUserProfilesFromDiscord(
-  ids: string[]
+  ids: string[],
+  batchSize: number = 5, // Max 10 requests per second
+  delay: number = 150 // 1 sec delay between batches
 ): Promise<DiscordProfile[]> {
   const fetchProfile = async (id: string): Promise<DiscordProfile> => {
     const response = await fetch(`https://discord.com/api/users/${id}`, {
@@ -54,6 +56,12 @@ export async function fetchUserProfilesFromDiscord(
       },
     });
 
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch profile for ID ${id}: ${response.statusText}`
+      );
+    }
+
     const data: DiscordProfile = await response.json();
 
     if (data.avatar === null) {
@@ -61,12 +69,32 @@ export async function fetchUserProfilesFromDiscord(
         parseInt(data.discriminator) % 5
       }.png`;
     } else {
-      const format = data.avatar?.startsWith("a_") ? "gif" : "png";
+      const format = data.avatar.startsWith("a_") ? "gif" : "png";
       data.avatar = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.${format}`;
     }
 
     return data;
   };
 
-  return Promise.all(ids.map(fetchProfile));
+  let results: DiscordProfile[] = [];
+
+  for (let i = 0; i < ids.length; i += batchSize) {
+    const batch = ids.slice(i, i + batchSize);
+
+    // Send batch of requests in parallel
+    const batchResults = await Promise.allSettled(batch.map(fetchProfile));
+
+    // Filter successful results
+    results = results.concat(
+      batchResults.flatMap((res) =>
+        res.status === "fulfilled" ? [res.value] : []
+      )
+    );
+
+    if (i + batchSize < ids.length) {
+      await new Promise((resolve) => setTimeout(resolve, delay)); // Wait 1 second before next batch
+    }
+  }
+
+  return results;
 }
