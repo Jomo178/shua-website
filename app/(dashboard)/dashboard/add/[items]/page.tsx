@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import AddCarousel from "@/container/add/add-carousel";
 import { getCurrentEvent } from "@/server/events-action";
@@ -5,7 +6,9 @@ import { ItemsType, Rarity } from "@prisma/client";
 
 import { getCurrentUser } from "@/lib/session";
 import { toUpperCase } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { getAllRarities } from "../../action";
@@ -26,8 +29,6 @@ export default async function Page({
 }) {
   const { items, rarities = [] } = await params;
   const issueEvent = await getCurrentEvent([items]);
-  //TODO: Add a check for the issueEvent
-  if (!issueEvent) return notFound();
   const getCurrentStaff = await getCurrentUser(true);
   if (!getCurrentStaff?.staff || !getCurrentStaff.staff.isInTeam)
     return notFound();
@@ -51,7 +52,18 @@ export default async function Page({
       <TabsContent value="issues">
         <Card className="ml-auto mr-auto max-h-fit max-w-fit p-6 md:p-11">
           <CardContent>
-            {!issueEvent ? null : (
+            {!issueEvent ? (
+              <EmptyState
+                className="border-none"
+                title={`No Issue event found`}
+                description={`Please create an issue event first`}
+                action={
+                  <Link href="/dashboard/events" prefetch={true}>
+                    <Button variant="outline">Create Event</Button>
+                  </Link>
+                }
+              />
+            ) : (
               <AddCarousel
                 rarities={rarities}
                 currentUser={getCurrentStaff.staff}

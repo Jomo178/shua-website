@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import { Prisma } from "@prisma/client";
 
 import {
@@ -36,6 +37,9 @@ export async function approveItems(
       }),
     ]);
 
+    revalidateTag("all-events");
+    revalidateTag("current-event");
+
     return {
       message: `Items approved successfully.`,
     };
@@ -62,6 +66,9 @@ export async function rejectItems(
     })),
   });
 
+  revalidateTag("all-events");
+  revalidateTag("current-event");
+
   return {
     message: `Items rejected successfully.`,
   };
@@ -87,6 +94,9 @@ export async function resubmitRejectedItems(
         },
       }),
     ]);
+
+    revalidateTag("all-events");
+    revalidateTag("current-event");
 
     return {
       message: `Items resubmitted successfully.`,
@@ -140,6 +150,9 @@ export async function deleteItems<T extends ItemsNameType>(
       });
     }
   }
+
+  revalidateTag("all-events");
+  revalidateTag("current-event");
 
   return {
     message: "Items deleted successfully.",
@@ -237,6 +250,9 @@ export async function editItems<T extends ItemsNameType>({
       include,
     });
   }
+
+  revalidateTag("all-events");
+  revalidateTag("current-event");
 
   return {
     message: `${items} edited successfully.`,

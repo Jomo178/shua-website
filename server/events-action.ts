@@ -25,8 +25,14 @@ export const getAllEvents = unstable_cache(
 
 export const getCurrentEvent = unstable_cache(
   async (items: ItemsType[]): Promise<EventsWithRelation | null> => {
-    const event = await prisma.events.findFirst({
-      where: { itemsReleaseType: { hasSome: items } },
+    const futureEvent = await prisma.events.findFirst({
+      where: {
+        itemsReleaseType: { hasSome: items },
+        start: { gt: new Date() },
+      },
+      orderBy: {
+        start: "asc",
+      },
       include: {
         createdBy: true,
         issues: true,
@@ -34,7 +40,25 @@ export const getCurrentEvent = unstable_cache(
       },
     });
 
-    return event;
+    if (futureEvent) return futureEvent;
+
+    const ongoingEvent = await prisma.events.findFirst({
+      where: {
+        itemsReleaseType: { hasSome: items },
+        start: { lte: new Date() },
+        end: { gt: new Date() },
+      },
+      orderBy: {
+        start: "asc",
+      },
+      include: {
+        createdBy: true,
+        issues: true,
+        pendingIssues: true,
+      },
+    });
+
+    return ongoingEvent;
   },
   ["/dashboard/events"],
   { revalidate: 60 * 60 * 24, tags: ["current-event"] }
