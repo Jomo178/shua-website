@@ -24,8 +24,6 @@ export const getStaffAllInformation = unstable_cache(
         (profile) => profile.id === staff.discordId
       );
 
-      console.log("discordProfile", discordProfile);
-
       const staffEmail = staffEmailsList.find(
         (email) => email.discordId === staff.discordId
       );
