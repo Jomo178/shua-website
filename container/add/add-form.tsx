@@ -8,19 +8,27 @@ import { format } from "date-fns";
 import { CalendarIcon, Info, Star } from "lucide-react";
 import { useForm } from "react-hook-form";
 
-import { toUpperCase } from "@/lib/utils";
+import { hasPermission, toUpperCase } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { FileUploader } from "@/components/ui/file-uploader";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { FloatingLabelInput } from "@/components/ui/input";
-import { Option } from "@/components/ui/multiselect";
+import MultipleSelector, { Option } from "@/components/ui/multiselect";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -41,6 +49,7 @@ interface AddFormProps {
   currentUser: Staff;
   rarities: Rarity[];
   event: Events;
+  events: Events[];
   defaultValues?: AddFormSchemaType;
   hiddenFields?: (keyof AddFormSchemaType)[];
   onFormChangeAction: (form: AddFormSchemaType, index: number) => void;
@@ -51,6 +60,7 @@ export default function AddForm({
   currentUser,
   rarities,
   event,
+  events,
   defaultValues = {} as any,
   hiddenFields = [],
   onFormChangeAction,
@@ -268,43 +278,67 @@ export default function AddForm({
                 />
               </>
             )}
-            {!isFieldHidden("releaseDate") && (
-              <FormField
-                control={form.control}
-                name="releaseDate"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel className="flex justify-between">
-                      Release Date
-                      <Tooltip>
-                        <TooltipTrigger disabled className="cursor-pointer">
-                          <Info size={16} />
-                        </TooltipTrigger>
-                        <TooltipContent className="w-56">
-                          {/* //TODO: fix this */}
-                          <p>
-                            The date the issue will be released. This is the
-                            date the issue will be available to the public after
-                            been approved.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </FormLabel>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        disabled
-                        className="w-full font-normal"
-                      >
-                        {format(field.value, "PPP")}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                    <FormMessage>{getFieldError("releaseDate")}</FormMessage>
-                  </FormItem>
-                )}
-              />
-            )}
+            <FormField
+              control={form.control}
+              name="eventId"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Event</FormLabel>
+                  <FormControl>
+                    <MultipleSelector
+                      disabled={hasPermission(currentUser, "handle:issues")}
+                      title="Select Event"
+                      placeholder="Select Event"
+                      hidePlaceholderWhenSelected
+                      hideClearAllButton
+                      options={events.map((event) => ({
+                        value: event.name,
+                        label: event.name,
+                      }))}
+                      maxSelected={1}
+                      emptyIndicator={
+                        <p className="text-center text-sm">No results found</p>
+                      }
+                      value={
+                        form.getValues("eventId") != ""
+                          ? [
+                              {
+                                value:
+                                  events.find(
+                                    (event) =>
+                                      event.id === form.getValues("eventId")
+                                  )?.name ?? "",
+                                label:
+                                  events.find(
+                                    (event) =>
+                                      event.id === form.getValues("eventId")
+                                  )?.name ?? "",
+                              },
+                            ]
+                          : []
+                      }
+                      onClick={() => {}}
+                      onChange={(value) => {
+                        const selectedEvent = events.find(
+                          (event) => event.name === value[0]?.value
+                        );
+
+                        form.setValue("eventId", selectedEvent?.id ?? "");
+                        form.setValue(
+                          "droppable",
+                          selectedEvent?.name.includes("Custom") ? false : true
+                        );
+                        onFormChangeAction(form.getValues(), index);
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Choose the event that the issue is related to.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             {!isFieldHidden("image") && (
               <>
                 <Separator className="my-1" />

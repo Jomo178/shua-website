@@ -20,12 +20,14 @@ interface AddCarouselProps {
   rarities: Rarity[];
   currentUser: Staff;
   event: Events;
+  events: Events[];
 }
 
 export default function AddCarousel({
   rarities,
   currentUser,
   event,
+  events,
 }: AddCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -76,6 +78,7 @@ export default function AddCarousel({
                 defaultValues={itemsForm}
                 currentUser={currentUser}
                 event={event}
+                events={events}
                 rarities={rarities}
                 onFormChangeAction={(value) => {
                   setItemsFormPropsValue((prev) =>

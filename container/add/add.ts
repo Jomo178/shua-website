@@ -13,6 +13,7 @@ export const addFormSchema = z.object({
   group: z.string().min(1, "Issue Group is required!"),
   code: z.string().min(1, "Issue Code is required!"),
   codeDuplicate: z.boolean().optional(),
+  droppable: z.boolean().optional().default(true),
   rarity: z.object({
     level: z
       .number()
@@ -77,6 +78,7 @@ export const defaultAddFromValues = () => {
       era: "",
       code: "",
       codeDuplicate: false,
+      droppable: true,
       rarity: { level: 1, icon: "default" },
       image: new File([""], "filename"),
     }

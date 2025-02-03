@@ -10,6 +10,9 @@ import { prisma } from "@/lib/database";
 export const getAllEvents = unstable_cache(
   async (): Promise<EventsWithRelation[]> => {
     const events = await prisma.events.findMany({
+      orderBy: {
+        name: "desc",
+      },
       include: {
         createdBy: true,
         issues: true,

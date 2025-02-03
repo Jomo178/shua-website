@@ -527,6 +527,7 @@ const MultipleSelector = React.forwardRef<
                     }}
                     onClick={() => handleUnselect(option)}
                     aria-label="Remove"
+                    disabled={disabled || option.fixed}
                   >
                     <X size={14} strokeWidth={2} aria-hidden="true" />
                   </button>

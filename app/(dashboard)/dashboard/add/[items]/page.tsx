@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AddCarousel from "@/container/add/add-carousel";
-import { getCurrentEvent } from "@/server/events-action";
+import { getAllEvents, getCurrentEvent } from "@/server/events-action";
 import { ItemsType, Rarity } from "@prisma/client";
 
 import { getCurrentUser } from "@/lib/session";
@@ -29,6 +29,7 @@ export default async function Page({
 }) {
   const { items, rarities = [] } = await params;
   const issueEvent = await getCurrentEvent([items]);
+  const allEvents = await getAllEvents();
   const getCurrentStaff = await getCurrentUser(true);
   if (!getCurrentStaff?.staff || !getCurrentStaff.staff.isInTeam)
     return notFound();
@@ -68,6 +69,7 @@ export default async function Page({
                 rarities={rarities}
                 currentUser={getCurrentStaff.staff}
                 event={issueEvent}
+                events={allEvents}
               />
             )}
           </CardContent>

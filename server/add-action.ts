@@ -32,7 +32,7 @@ export async function addIssues(
       image: uploadImage.data.url,
       createdById: formData.createdById,
       eventId: formData.eventId,
-      droppable: true,
+      droppable: formData.droppable,
     },
   });
 
