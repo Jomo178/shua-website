@@ -278,67 +278,73 @@ export default function AddForm({
                 />
               </>
             )}
-            <FormField
-              control={form.control}
-              name="eventId"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Event</FormLabel>
-                  <FormControl>
-                    <MultipleSelector
-                      disabled={hasPermission(currentUser, "handle:issues")}
-                      title="Select Event"
-                      placeholder="Select Event"
-                      hidePlaceholderWhenSelected
-                      hideClearAllButton
-                      options={events.map((event) => ({
-                        value: event.name,
-                        label: event.name,
-                      }))}
-                      maxSelected={1}
-                      emptyIndicator={
-                        <p className="text-center text-sm">No results found</p>
-                      }
-                      value={
-                        form.getValues("eventId") != ""
-                          ? [
-                              {
-                                value:
-                                  events.find(
-                                    (event) =>
-                                      event.id === form.getValues("eventId")
-                                  )?.name ?? "",
-                                label:
-                                  events.find(
-                                    (event) =>
-                                      event.id === form.getValues("eventId")
-                                  )?.name ?? "",
-                              },
-                            ]
-                          : []
-                      }
-                      onClick={() => {}}
-                      onChange={(value) => {
-                        const selectedEvent = events.find(
-                          (event) => event.name === value[0]?.value
-                        );
+            {!isFieldHidden("eventId") && (
+              <FormField
+                control={form.control}
+                name="eventId"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Event</FormLabel>
+                    <FormControl>
+                      <MultipleSelector
+                        disabled={hasPermission(currentUser, "handle:issues")}
+                        title="Select Event"
+                        placeholder="Select Event"
+                        hidePlaceholderWhenSelected
+                        hideClearAllButton
+                        options={events.map((event) => ({
+                          value: event.name,
+                          label: event.name,
+                        }))}
+                        maxSelected={1}
+                        emptyIndicator={
+                          <p className="text-center text-sm">
+                            No results found
+                          </p>
+                        }
+                        value={
+                          form.getValues("eventId") != ""
+                            ? [
+                                {
+                                  value:
+                                    events.find(
+                                      (event) =>
+                                        event.id === form.getValues("eventId")
+                                    )?.name ?? "",
+                                  label:
+                                    events.find(
+                                      (event) =>
+                                        event.id === form.getValues("eventId")
+                                    )?.name ?? "",
+                                },
+                              ]
+                            : []
+                        }
+                        onClick={() => {}}
+                        onChange={(value) => {
+                          const selectedEvent = events.find(
+                            (event) => event.name === value[0]?.value
+                          );
 
-                        form.setValue("eventId", selectedEvent?.id ?? "");
-                        form.setValue(
-                          "droppable",
-                          selectedEvent?.name.includes("Custom") ? false : true
-                        );
-                        onFormChangeAction(form.getValues(), index);
-                      }}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Choose the event that the issue is related to.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                          form.setValue("eventId", selectedEvent?.id ?? "");
+                          form.setValue(
+                            "droppable",
+                            selectedEvent?.name.includes("Custom")
+                              ? false
+                              : true
+                          );
+                          onFormChangeAction(form.getValues(), index);
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Choose the event that the issue is related to.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             {!isFieldHidden("image") && (
               <>
                 <Separator className="my-1" />

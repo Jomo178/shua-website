@@ -96,12 +96,15 @@ export default function EditItemsDialog<T extends ItemsNameType>({
   const handleEdit = async () => {
     await handleEditItems({
       itemsViewPortId: viewPortType.id,
-      item: {...itemData, rarity: {
-        level: item.rarity.level,
-        icon:
-          rarities.find((r) => r.name === item.rarity.icon)?.icon ??
-          "default",
-      }},
+      item: {
+        ...itemData,
+        rarity: {
+          level: item.rarity.level,
+          icon:
+            rarities.find((r) => r.name === item.rarity.icon)?.icon ??
+            "default",
+        },
+      },
     });
 
     setOpenDialogAction(false);
@@ -186,6 +189,7 @@ function EditFrom<T extends ItemsNameType>({
       defaultValues={itemData}
       currentUser={currentUser}
       event={event}
+      events={[...new Set([event])]}
       rarities={rarities}
       onFormChangeAction={(value) => {
         setItemDataAction((prev) => {

@@ -76,6 +76,7 @@ export function ItemsCustomPropertiesDialog({
         </CredenzaHeader>
         <AddForm
           index={1}
+          events={[]}
           rarities={rarities}
           defaultValues={getNewCustomProps}
           currentUser={currentUser}
@@ -86,7 +87,7 @@ export function ItemsCustomPropertiesDialog({
               return updatedValue;
             });
           }}
-          hiddenFields={["name", "image", "releaseDate"]}
+          hiddenFields={["name", "image", "releaseDate", "eventId"]}
         />
         <CredenzaFooter className="flex flex-row justify-center">
           <Button
