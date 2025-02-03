@@ -109,7 +109,7 @@ model Cards {
   image  String
   date   DateTime
   owner  String
-  issue  String   @unique
+  issue  String  
 
   @@map("cards")
 }

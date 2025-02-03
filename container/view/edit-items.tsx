@@ -96,7 +96,12 @@ export default function EditItemsDialog<T extends ItemsNameType>({
   const handleEdit = async () => {
     await handleEditItems({
       itemsViewPortId: viewPortType.id,
-      item: itemData,
+      item: {...itemData, rarity: {
+        level: item.rarity.level,
+        icon:
+          rarities.find((r) => r.name === item.rarity.icon)?.icon ??
+          "default",
+      }},
     });
 
     setOpenDialogAction(false);

@@ -9,6 +9,7 @@
     "lint": "next lint",
     "push": "dotenv -e .env.local -- npx prisma db push",
     "migrate": "dotenv -e .env.local -- npx prisma migrate",
+    "studio": "dotenv -e .env.local -- npx prisma studio",
     "generate": "npx prisma generate"
   },
   "dependencies": {
