@@ -358,8 +358,9 @@ export default function EventCard({
                         <AlertDialogTrigger
                           asChild
                           disabled={
-                            new Date(event.end).getTime() <
-                              currentTime.getTime() ||
+                            (!event.name.includes("Custom") &&
+                              new Date(event.end).getTime() <
+                                currentTime.getTime()) ||
                             hasPermission(currentUser, "handle:event")
                           }
                         >
@@ -410,7 +411,7 @@ export default function EventCard({
                                   key={index}
                                   className="text-xs text-muted-foreground"
                                 >
-                                  {`Approved ${toUpperCase(type)}: ${event[type].length + event[pendingName].length}`}
+                                  {`Approved ${toUpperCase(type)}: ${event[pendingName].length}`}
                                   {index < event.itemsReleaseType.length - 1 &&
                                     ", "}
                                 </span>
