@@ -19,7 +19,7 @@ export const addFormSchema = z.object({
       .number()
       .int()
       .min(1, "Rarity Level is required!")
-      .max(4, "Rarity Level cannot exceed 5!"),
+      .max(5, "Rarity Level cannot exceed 5!"),
     icon: z.string().min(1, "Rarity Icon is required!"),
   }),
   image: fileValidation(),

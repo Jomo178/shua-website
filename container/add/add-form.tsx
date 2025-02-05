@@ -85,7 +85,7 @@ export default function AddForm({
 
   const rarityArray = [
     { value: "xV", label: "Issue Level", disable: true },
-    ...(Array.from({ length: 4 }, (_, i) => ({
+    ...(Array.from({ length: 5 }, (_, i) => ({
       value: (i + 1).toString() + "_level",
       label: `Level ${i + 1}`,
       icon: Array.from({ length: i + 1 }, (_) => Star),
