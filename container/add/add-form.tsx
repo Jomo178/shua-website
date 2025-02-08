@@ -73,6 +73,7 @@ export default function AddForm({
       ...defaultValues,
       createdById: currentUser.id,
       eventId: event.id,
+      droppable: event.name.includes("Custom") ? false : true,
     },
   });
 
