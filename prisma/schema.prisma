@@ -90,6 +90,7 @@ enum AuthorizationType {
   issues
   staff
   event
+  bot
 }
 
 enum StaffRole {
@@ -97,7 +98,6 @@ enum StaffRole {
   owner
   admin
   shuaStaff
-  botAdmin
 }
 
 model Cards {
