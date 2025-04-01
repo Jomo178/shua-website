@@ -160,6 +160,32 @@ export async function releaseEvent(eventId: string) {
     });
 
     if (approvedPendingIssues.length === 0) {
+      const reReleaseIssues = await tx.issues.findMany({
+        where: {
+          eventId,
+          droppable: false,
+        },
+        include: {
+          event: true,
+        },
+      });
+
+      if (reReleaseIssues.length > 0) {
+        await tx.issues.updateMany({
+          where: {
+            eventId,
+            droppable: false,
+          },
+          data: {
+            droppable: true,
+          },
+        });
+
+        return {
+          message: "Event released successfully!",
+        };
+      }
+
       return { message: "No approved pending issues found." };
     }
 
