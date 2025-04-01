@@ -97,6 +97,7 @@ enum StaffRole {
   owner
   admin
   shuaStaff
+  botAdmin
 }
 
 model Cards {
